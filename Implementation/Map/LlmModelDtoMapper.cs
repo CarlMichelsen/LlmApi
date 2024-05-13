@@ -19,6 +19,10 @@ public static class LlmModelDtoMapper
         return new LlmModelDto(
             Id: modelEntity.Id.Value,
             ProviderName: providerName,
+            Price: new LlmPriceDto(
+                Id: modelEntity.Price.Id.Value,
+                MillionInputTokenPrice: modelEntity.Price.MillionInputTokenPrice,
+                MillionOutputTokenPrice: modelEntity.Price.MillionOutputTokenPrice),
             ModelIdentifierName: modelEntity.ModelIdentifierName,
             MaxTokenCount: modelEntity.MaxTokenCount,
             ImageSupport: modelEntity.ImageSupport,
@@ -37,10 +41,18 @@ public static class LlmModelDtoMapper
             throw new MapException("modelDto.ProviderName can't be mapped to a valid LlmProvider enum.");
         }
 
+        var modelEntityId = new ModelEntityId(modelDto.Id);
         return new ModelEntity
         {
-            Id = new ModelEntityId(modelDto.Id),
+            Id = modelEntityId,
             Provider = result,
+            Price = new PriceEntity
+            {
+                Id = new PriceEntityId(modelDto.Price.Id),
+                ModelId = modelEntityId,
+                MillionInputTokenPrice = modelDto.Price.MillionInputTokenPrice,
+                MillionOutputTokenPrice = modelDto.Price.MillionOutputTokenPrice,
+            },
             ModelIdentifierName = modelDto.ModelIdentifierName,
             MaxTokenCount = modelDto.MaxTokenCount,
             ImageSupport = modelDto.ImageSupport,

@@ -1,8 +1,12 @@
-﻿using Domain.Dto.Anthropic;
+﻿using Domain.Abstraction;
+using Domain.Dto.Anthropic;
+using Domain.Dto.Anthropic.Response.Stream;
 
 namespace Interface.Client;
 
 public interface IAnthropicClient
 {
-    Task<AnthropicResponse> Prompt(AnthropicPrompt anthropicPrompt);
+    Task<Result<AnthropicResponse>> Prompt(AnthropicPrompt anthropicPrompt, CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<Result<AnthropicStreamEvent>> PromptStream(AnthropicPrompt anthropicPrompt, CancellationToken cancellationToken = default);
 }

@@ -15,7 +15,22 @@ namespace Api.Migrations
                 name: "LlmApi");
 
             migrationBuilder.CreateTable(
-                name: "Models",
+                name: "PriceEntity",
+                schema: "LlmApi",
+                columns: table => new
+                {
+                    ModelId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: true),
+                    MillionInputTokenPrice = table.Column<long>(type: "bigint", nullable: false),
+                    MillionOutputTokenPrice = table.Column<long>(type: "bigint", nullable: false),
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PriceEntity", x => x.ModelId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModelEntity",
                 schema: "LlmApi",
                 columns: table => new
                 {
@@ -32,7 +47,14 @@ namespace Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Models", x => x.Id);
+                    table.PrimaryKey("PK_ModelEntity", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ModelEntity_PriceEntity_Id",
+                        column: x => x.Id,
+                        principalSchema: "LlmApi",
+                        principalTable: "PriceEntity",
+                        principalColumn: "ModelId",
+                        onDelete: ReferentialAction.Cascade);
                 });
         }
 
@@ -40,7 +62,11 @@ namespace Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Models",
+                name: "ModelEntity",
+                schema: "LlmApi");
+
+            migrationBuilder.DropTable(
+                name: "PriceEntity",
                 schema: "LlmApi");
         }
     }

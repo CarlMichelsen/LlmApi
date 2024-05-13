@@ -19,11 +19,11 @@ public class LlmModelRepositoryTests : DatabaseTest
     {
         // Arrange
         var identifier = Guid.NewGuid();
-        var model = this.MockModelEntity(identifier);
+        var model = this.MockModelEntity(identifier, Guid.NewGuid());
 
         // Act
         var result = await this.SUT.AddModel(model);
-        var reFetched = await this.Context.Models.FirstOrDefaultAsync(m => m.Id == model.Id);
+        var reFetched = await this.Context.ModelEntity.FirstOrDefaultAsync(m => m.Id == model.Id);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -40,31 +40,33 @@ public class LlmModelRepositoryTests : DatabaseTest
         // Arrange
         var initialSetList = new List<ModelEntity>
         {
-            this.MockModelEntity(Guid.NewGuid()),
-            this.MockModelEntity(Guid.NewGuid()),
-            this.MockModelEntity(Guid.NewGuid()),
-            this.MockModelEntity(Guid.NewGuid()),
-            this.MockModelEntity(Guid.NewGuid()),
+            this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
+            this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
+            this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
+            this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
+            this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
         };
+
         var initialSetResult = await this.SUT.SetModels(initialSetList);
 
         // Act
         var identifier = Guid.NewGuid();
         var invalidModels = new List<ModelEntity>
         {
-            this.MockModelEntity(identifier),
-            this.MockModelEntity(identifier),
-            this.MockModelEntity(Guid.NewGuid()),
-            this.MockModelEntity(identifier),
-            this.MockModelEntity(Guid.NewGuid()),
+            this.MockModelEntity(identifier, Guid.NewGuid()),
+            this.MockModelEntity(identifier, Guid.NewGuid()),
+            this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
+            this.MockModelEntity(identifier, Guid.NewGuid()),
+            this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
         };
 
         var setResult = await this.SUT.SetModels(invalidModels);
 
         // Assert
         Assert.False(setResult.IsSuccess);
+        Assert.True(initialSetResult.IsSuccess);
 
-        var currentList = await this.Context.Models.ToListAsync();
+        var currentList = await this.Context.ModelEntity.ToListAsync();
         foreach (var initialModel in initialSetList)
         {
             ModelEqual(initialModel, currentList.First(cl => cl.Id == initialModel.Id));
@@ -76,13 +78,13 @@ public class LlmModelRepositoryTests : DatabaseTest
     {
         // Arrange
         var identifier = Guid.NewGuid();
-        var model = this.MockModelEntity(identifier);
-        this.Context.Models.Add(model);
+        var model = this.MockModelEntity(identifier, Guid.NewGuid());
+        this.Context.ModelEntity.Add(model);
         await this.Context.SaveChangesAsync();
 
         // Act
         var result = await this.SUT.DeleteModel(model.Id);
-        var reFetched = await this.Context.Models.FirstOrDefaultAsync(m => m.Id == model.Id);
+        var reFetched = await this.Context.ModelEntity.FirstOrDefaultAsync(m => m.Id == model.Id);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -97,9 +99,9 @@ public class LlmModelRepositoryTests : DatabaseTest
     {
         // Arrange
         var identifier = Guid.NewGuid();
-        var exsisting = this.MockModelEntity(identifier);
-        var updated = this.MockModelEntity(identifier);
-        this.Context.Models.Add(exsisting);
+        var exsisting = this.MockModelEntity(identifier, Guid.NewGuid());
+        var updated = this.MockModelEntity(identifier, Guid.NewGuid());
+        this.Context.ModelEntity.Add(exsisting);
         await this.Context.SaveChangesAsync();
 
         // Act
@@ -135,13 +137,21 @@ public class LlmModelRepositoryTests : DatabaseTest
         return (TEnum)values.GetValue(random.Next(values.Length))!;
     }
 
-    private ModelEntity MockModelEntity(Guid identifier, Random? ran = default)
+    private ModelEntity MockModelEntity(Guid identifier, Guid priceIdentifier, Random? ran = default)
     {
         var random = ran ?? new Random();
+        var modelEntityId = new ModelEntityId(identifier);
         return new ModelEntity
         {
-            Id = new ModelEntityId(identifier),
+            Id = modelEntityId,
             Provider = RandomEnum<LlmProvider>(random),
+            Price = new PriceEntity
+            {
+                Id = new PriceEntityId(priceIdentifier),
+                ModelId = modelEntityId,
+                MillionInputTokenPrice = random.NextInt64(50, 2000),
+                MillionOutputTokenPrice = random.NextInt64(50, 4000),
+            },
             ModelIdentifierName = "TestModel",
             MaxTokenCount = random.NextInt64(4032, 8064),
             ImageSupport = random.Next(1) == 0,

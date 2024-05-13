@@ -19,9 +19,10 @@ public class AnthropicContentConverter : JsonConverter<AnthropicContent>
             var typeDiscriminator = root.GetProperty("type").GetString();
             var actualType = typeDiscriminator switch
             {
+                "text_delta" => typeof(AnthropicTextContent),
                 "text" => typeof(AnthropicTextContent),
                 "image" => typeof(AnthropicImageContent),
-                _ => throw new JsonException("Unknown AnthropicContent type."),
+                _ => throw new JsonException($"Unknown AnthropicContent type \"{typeDiscriminator}\"."),
             };
 
             var rawJson = root.GetRawText();

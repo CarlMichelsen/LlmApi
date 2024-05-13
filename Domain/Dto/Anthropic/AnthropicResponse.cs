@@ -19,5 +19,5 @@ public class AnthropicResponse
     
     public required List<AnthropicContent> Content { get; init; }
 
-    public required string StopReason { get; init; }
+    public string? StopReason { get; init; }
 }

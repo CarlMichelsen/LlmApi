@@ -5,10 +5,10 @@ public enum LlmContentType
     /// <summary>
     /// Text content type.
     /// </summary>
-    Text,
+    Text = 1000,
 
     /// <summary>
     /// Base64 image content type.
     /// </summary>
-    Image,
+    Image = 2000,
 }

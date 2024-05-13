@@ -1,6 +1,6 @@
 ﻿namespace Domain.Dto.Anthropic.Content;
 
-public class AnthropicContent
+public abstract class AnthropicContent
 {
-    public virtual string Type => "none";
+    public abstract string Type { get; }
 }

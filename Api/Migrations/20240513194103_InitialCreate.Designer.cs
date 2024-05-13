@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240509153003_InitialCreate")]
+    [Migration("20240513194103_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -63,7 +63,37 @@ namespace Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Models", "LlmApi");
+                    b.ToTable("ModelEntity", "LlmApi");
+                });
+
+            modelBuilder.Entity("Domain.Entity.PriceEntity", b =>
+                {
+                    b.Property<Guid>("ModelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("MillionInputTokenPrice")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("MillionOutputTokenPrice")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ModelId");
+
+                    b.ToTable("PriceEntity", "LlmApi");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ModelEntity", b =>
+                {
+                    b.HasOne("Domain.Entity.PriceEntity", "Price")
+                        .WithOne()
+                        .HasForeignKey("Domain.Entity.ModelEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Price");
                 });
 #pragma warning restore 612, 618
         }

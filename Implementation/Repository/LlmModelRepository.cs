@@ -15,13 +15,15 @@ public class LlmModelRepository(
 
     public async Task<Result<ModelEntity>> AddModel(ModelEntity modelEntity)
     {
-        var exsisting = await applicationContext.Models.FindAsync(modelEntity.Id);
+        var exsisting = await applicationContext.ModelEntity
+            .Include(m => m.Price)
+            .FirstOrDefaultAsync(m => m.Id == modelEntity.Id);
         if (exsisting is not null)
         {
             return new SafeUserFeedbackException("Model already exsists");
         }
 
-        var res = await applicationContext.Models
+        var res = await applicationContext.ModelEntity
             .AddAsync(modelEntity);
         await applicationContext.SaveChangesAsync();
 
@@ -36,14 +38,16 @@ public class LlmModelRepository(
 
     public async Task<Result<ModelEntity>> DeleteModel(ModelEntityId id)
     {
-        var entity = await applicationContext.Models.FindAsync(id);
+        var entity = await applicationContext.ModelEntity
+            .Include(m => m.Price)
+            .FirstOrDefaultAsync(m => m.Id == id);
 
         if (entity is null)
         {
             return new SafeUserFeedbackException("Model not found", NoActionWasTakenString);
         }
 
-        applicationContext.Models.Remove(entity);
+        applicationContext.ModelEntity.Remove(entity);
 
         var saveResult = await applicationContext.SaveChangesAsync();
 
@@ -57,7 +61,8 @@ public class LlmModelRepository(
 
     public async Task<Result<List<ModelEntity>>> GetAllModels()
     {
-        var entities = await applicationContext.Models
+        var entities = await applicationContext.ModelEntity
+            .Include(m => m.Price)
             .ToListAsync();
 
         if (entities is null)
@@ -75,8 +80,9 @@ public class LlmModelRepository(
 
     public async Task<Result<ModelEntity>> GetModel(ModelEntityId id)
     {
-        var entity = await applicationContext.Models
-            .FindAsync(id);
+        var entity = await applicationContext.ModelEntity
+            .Include(m => m.Price)
+            .FirstOrDefaultAsync(m => m.Id == id);
 
         if (entity is null)
         {
@@ -90,8 +96,9 @@ public class LlmModelRepository(
 
     public async Task<Result<List<ModelEntity>>> GetModelsByProvider(LlmProvider provider)
     {
-        var entities = await applicationContext.Models
+        var entities = await applicationContext.ModelEntity
             .Where(m => m.Provider == provider)
+            .Include(m => m.Price)
             .ToListAsync();
 
         if (entities is null)
@@ -113,14 +120,21 @@ public class LlmModelRepository(
         {
             try
             {
-                var entities = applicationContext.Models.ToList();
+                var entities = applicationContext.ModelEntity.ToList();
                 if (entities.Count != 0)
                 {
-                    applicationContext.Models.RemoveRange(entities);
+                    applicationContext.ModelEntity.RemoveRange(entities);
                 }
 
-                applicationContext.Models.AddRange(modelEntities);
+                var prices = applicationContext.PriceEntity.ToList();
+                if (prices.Count != 0)
+                {
+                    applicationContext.PriceEntity.RemoveRange(prices);
+                }
 
+                applicationContext.SaveChanges();
+
+                applicationContext.ModelEntity.AddRange(modelEntities);
                 applicationContext.SaveChanges();
                 await transaction.CommitAsync();
 
@@ -136,24 +150,46 @@ public class LlmModelRepository(
 
     public async Task<Result<ModelEntity>> UpdateModel(ModelEntity modelEntity)
     {
-        var entity = await applicationContext.Models
-            .FindAsync(modelEntity.Id);
-
-        if (entity is null)
+        using (var transaction = applicationContext.Database.BeginTransaction())
         {
-            return new SafeUserFeedbackException("Model not found", NoActionWasTakenString);
+            try
+            {
+                var entity = await applicationContext.ModelEntity
+                    .Include(m => m.Price)
+                    .FirstOrDefaultAsync(m => m.Id == modelEntity.Id);
+
+                if (entity is null)
+                {
+                    return new SafeUserFeedbackException("Model not found", NoActionWasTakenString);
+                }
+
+                applicationContext.ModelEntity.Remove(entity);
+                applicationContext.PriceEntity.Remove(entity.Price);
+                var deleted = await applicationContext.SaveChangesAsync();
+
+                if (deleted == 0)
+                {
+                    await transaction.RollbackAsync();
+                    return new SafeUserFeedbackException("No rows were affected in the database (RM)");
+                }
+
+                applicationContext.ModelEntity.Add(modelEntity);
+                var affected = await applicationContext.SaveChangesAsync();
+
+                if (affected == 0)
+                {
+                    await transaction.RollbackAsync();
+                    return new SafeUserFeedbackException("No rows were affected in the database (UP)");
+                }
+
+                await transaction.CommitAsync();
+                return modelEntity;
+            }
+            catch (Exception e)
+            {
+                await transaction.RollbackAsync();
+                return e;
+            }
         }
-
-        applicationContext.Models.Remove(entity);
-        applicationContext.Models.Add(modelEntity);
-
-        var affected = await applicationContext.SaveChangesAsync();
-
-        if (affected == 0)
-        {
-            return new SafeUserFeedbackException("No rows were affected in the database");
-        }
-
-        return modelEntity;
     }
 }

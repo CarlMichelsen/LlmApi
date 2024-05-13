@@ -111,6 +111,6 @@ public class ModelHandler(
             return new ServiceResponse<T>(errors.ToArray());
         }
 
-        return new ServiceResponse<T>("Error");
+        return new ServiceResponse<T>("Internal error");
     }
 }

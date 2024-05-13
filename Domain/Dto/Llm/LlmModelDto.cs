@@ -3,6 +3,7 @@
 public record LlmModelDto(
     Guid Id,
     string ProviderName,
+    LlmPriceDto Price,
     string ModelIdentifierName,
     long MaxTokenCount,
     bool ImageSupport,

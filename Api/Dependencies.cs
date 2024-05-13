@@ -2,10 +2,11 @@
 using Implementation.Client;
 using Implementation.Database;
 using Implementation.Handler;
+using Implementation.Json.Reader;
 using Implementation.Repository;
 using Implementation.Service;
-using Interface.Client;
 using Interface.Handler;
+using Interface.Json;
 using Interface.Repository;
 using Interface.Service;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,10 @@ public static class Dependencies
         builder.Configuration.AddJsonFile("secrets.json", optional: false, reloadOnChange: true);
         builder.Services
             .Configure<AnthropicOptions>(builder.Configuration.GetSection(AnthropicOptions.SectionName));
+        
+        // Json
+        builder.Services
+            .AddScoped<IStreamLineReader, StreamLineReader>();
 
         // Handler
         builder.Services

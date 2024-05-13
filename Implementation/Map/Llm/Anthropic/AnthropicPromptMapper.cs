@@ -8,7 +8,7 @@ using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Prompt.Content;
 using LargeLanguageModelClient.Dto.Response;
 
-namespace Implementation.Map.Llm;
+namespace Implementation.Map.Llm.Anthropic;
 
 public class AnthropicPromptMapper(ModelEntity modelEntity)
 {
@@ -35,25 +35,6 @@ public class AnthropicPromptMapper(ModelEntity modelEntity)
             StopReason: anthropicResponse.StopReason);
     }
 
-    public Result<LlmPromptMessageDto> MapMessage(AnthropicResponse anthropicResponse)
-    {
-        var contentMapResults = anthropicResponse.Content.Select(this.Map).ToList();
-        var contents = new List<LlmContent>();
-        foreach (var contentResult in contentMapResults)
-        {
-            if (contentResult.IsError)
-            {
-                return contentResult.Error!;
-            }
-
-            contents.Add(contentResult.Unwrap());
-        }
-
-        return new LlmPromptMessageDto(
-            IsUserMessage: anthropicResponse.Role == "user",
-            Content: contents);
-    }
-
     public Result<LlmContent> Map(AnthropicContent anthropicContent)
     {
         switch (anthropicContent)
@@ -70,23 +51,6 @@ public class AnthropicPromptMapper(ModelEntity modelEntity)
                 return new MapException(
                     $"Attempted to map unsupported content type ${nameof(anthropicContent.Type)}");
         }
-    }
-
-    public Result<LlmImageContent> MapImageContent(AnthropicImageContent anthropicImageContent)
-    {
-        return new LlmImageContent
-        {
-            MediaType = anthropicImageContent.Source.MediaType,
-            Data = anthropicImageContent.Source.Data,
-        };
-    }
-
-    public Result<LlmTextContent> MapTextContent(AnthropicTextContent anthropicTextContent)
-    {
-        return new LlmTextContent
-        {
-            Text = anthropicTextContent.Text,
-        };
     }
 
     public Result<LlmUsage> Map(AnthropicUsage anthropicUsage)
@@ -164,6 +128,25 @@ public class AnthropicPromptMapper(ModelEntity modelEntity)
         }
     }
 
+    public Result<LlmPromptMessageDto> MapMessage(AnthropicResponse anthropicResponse)
+    {
+        var contentMapResults = anthropicResponse.Content.Select(this.Map).ToList();
+        var contents = new List<LlmContent>();
+        foreach (var contentResult in contentMapResults)
+        {
+            if (contentResult.IsError)
+            {
+                return contentResult.Error!;
+            }
+
+            contents.Add(contentResult.Unwrap());
+        }
+
+        return new LlmPromptMessageDto(
+            IsUserMessage: anthropicResponse.Role == "user",
+            Content: contents);
+    }
+
     public Result<AnthropicImageContent> MapImageContent(LlmImageContent llmImageContent)
     {
         return new AnthropicImageContent
@@ -177,11 +160,28 @@ public class AnthropicPromptMapper(ModelEntity modelEntity)
         };
     }
 
+    public Result<LlmImageContent> MapImageContent(AnthropicImageContent anthropicImageContent)
+    {
+        return new LlmImageContent
+        {
+            MediaType = anthropicImageContent.Source.MediaType,
+            Data = anthropicImageContent.Source.Data,
+        };
+    }
+
     public Result<AnthropicTextContent> MapTextContent(LlmTextContent llmTextContent)
     {
         return new AnthropicTextContent
         {
             Text = llmTextContent.Text,
+        };
+    }
+
+    public Result<LlmTextContent> MapTextContent(AnthropicTextContent anthropicTextContent)
+    {
+        return new LlmTextContent
+        {
+            Text = anthropicTextContent.Text,
         };
     }
 

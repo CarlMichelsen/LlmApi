@@ -1,6 +1,5 @@
 using Api;
 using Api.Endpoints;
-using Interface.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,10 +27,6 @@ app.RegisterModelEndpoints(apiGroup);
 
 apiGroup.WithOpenApi();
 
-using (var scope = app.Services.CreateScope())
-{
-    var service = scope.ServiceProvider.GetRequiredService<ILargeLanguageModelService>();
-    await FunAndGames.Run(service);
-}
+// using (var scope = app.Services.CreateScope()) { await FunAndGames.Run(scope); }
 
 app.Run();

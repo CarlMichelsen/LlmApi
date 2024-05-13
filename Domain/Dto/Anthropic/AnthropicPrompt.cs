@@ -4,4 +4,5 @@ public record AnthropicPrompt(
     string Model,
     long MaxTokens,
     string? System,
-    List<AnthropicMessage> Messages);
+    List<AnthropicMessage> Messages,
+    bool Stream = false);

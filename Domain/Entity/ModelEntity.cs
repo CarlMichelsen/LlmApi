@@ -8,6 +8,8 @@ public class ModelEntity
 
     public required LlmProvider Provider { get; init; }
 
+    public required PriceEntity Price { get; init; }
+
     public required string ModelIdentifierName { get; init; }
 
     public required long MaxTokenCount { get; init; }
