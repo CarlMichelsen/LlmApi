@@ -7,7 +7,7 @@ using Interface.Json;
 
 namespace Implementation.Json.Reader;
 
-public class AnthropicStreamHandler(
+public class AnthropicStreamReader(
     IStreamLineReader streamLineReader)
 {
     private const string LineTypeEvent = "event";
@@ -27,9 +27,9 @@ public class AnthropicStreamHandler(
         },
     };
 
-    public async IAsyncEnumerable<Result<AnthropicStreamEvent>> ReadLine(
+    public async IAsyncEnumerable<Result<AnthropicStreamEvent>> Read(
         Stream stream,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var lineReader = streamLineReader.ReadLine(stream, cancellationToken);
 

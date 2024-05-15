@@ -2,38 +2,23 @@
 using Domain.Abstraction;
 using Domain.Dto.Anthropic.Response.Stream;
 using Domain.Entity;
-using Domain.Exception;
 using LargeLanguageModelClient.Dto.Response.Stream;
-using LargeLanguageModelClient.Dto.Response.Stream.Event;
 using Microsoft.Extensions.Logging;
 
 namespace Implementation.Map.Llm.Anthropic;
 
 public class AnthropicStreamMapper(ILogger logger, ModelEntity model)
 {
-    public static LlmStreamError HandleSafeUserFeedback(Exception e, ILogger logger)
-    {
-        if (e is SafeUserFeedbackException)
-        {
-            var safeException = e as SafeUserFeedbackException;
-            List<string> messages = [safeException!.Message, ..safeException.Details];
-            return new LlmStreamError(string.Join(' ', messages));
-        }
-
-        logger.LogCritical(e, "Exception in mapper");
-        return new LlmStreamError("Unhandled error occured");
-    }
-
     public async IAsyncEnumerable<LlmStreamEvent> MapToLlmStream(
         IAsyncEnumerable<Result<AnthropicStreamEvent>> stream,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var handler = new AnthropicStreamResponseMappingHandler(logger, model);
         await foreach (var anthropicStreamEventResult in stream)
         {
             if (anthropicStreamEventResult.IsError)
             {
-                yield return HandleSafeUserFeedback(anthropicStreamEventResult.Error!, logger);
+                yield return LlmStreamMapper.HandleSafeUserFeedback(anthropicStreamEventResult.Error!, logger);
                 break;
             }
 

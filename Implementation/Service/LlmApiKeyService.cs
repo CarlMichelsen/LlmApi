@@ -11,6 +11,7 @@ namespace Implementation.Service;
 
 public class LlmApiKeyService(
     ILogger<LlmApiKeyService> logger,
+    IOptions<OpenAiOptions> openAiOptions,
     IOptions<AnthropicOptions> anthropicOptions) : ILlmApiKeyService
 {
     private static Dictionary<LlmProvider, List<string>> keysInUse = new();
@@ -48,7 +49,15 @@ public class LlmApiKeyService(
             reservedKeysForProvider = list;
         }
 
-        var availableApiKeyNames = anthropicOptions.Value.NameKeyPairs
+        var keyNameDictionaryResult = this.GetNameKeysForProvider(llmProvider);
+        if (keyNameDictionaryResult.IsError)
+        {
+            return Task.FromResult<Result<KeyValuePair<string, string>>>(keyNameDictionaryResult.Error!);
+        }
+
+        var keyNameDictionary = keyNameDictionaryResult.Unwrap();
+
+        var availableApiKeyNames = keyNameDictionary
             .Select(kv => kv.Key)
             .Where(name => !reservedKeysForProvider!.Contains(name))
             .ToList();
@@ -62,7 +71,7 @@ public class LlmApiKeyService(
         
         var random = ran ?? new Random();
         var randomAvailableApiKeyName = availableApiKeyNames[random.Next(availableApiKeyNames.Count)];
-        if (anthropicOptions.Value.NameKeyPairs.TryGetValue(randomAvailableApiKeyName, out var availableApiKey))
+        if (keyNameDictionary.TryGetValue(randomAvailableApiKeyName, out var availableApiKey))
         {
             var pair = new KeyValuePair<string, string>(randomAvailableApiKeyName, availableApiKey);
             return Task.FromResult<Result<KeyValuePair<string, string>>>(pair);
@@ -70,4 +79,12 @@ public class LlmApiKeyService(
 
         return Task.FromResult<Result<KeyValuePair<string, string>>>(new NoAvailableApiKeyException("Failed to find api key by name?", llmProvider));
     }
+
+    private Result<Dictionary<string, string>> GetNameKeysForProvider(LlmProvider llmProvider)
+        => llmProvider switch
+        {
+            LlmProvider.OpenAi => openAiOptions.Value.NameKeyPairs,
+            LlmProvider.Anthropic => anthropicOptions.Value.NameKeyPairs,
+            _ => throw new NotImplementedException($"{Enum.GetName(llmProvider)} is not implemented in LlmApiKeyService"),
+        };
 }

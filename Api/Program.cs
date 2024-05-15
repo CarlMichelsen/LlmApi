@@ -27,6 +27,5 @@ app.RegisterModelEndpoints(apiGroup);
 
 apiGroup.WithOpenApi();
 
-// using (var scope = app.Services.CreateScope()) { await FunAndGames.Run(scope); }
-
+// using (var scope = app.Services.CreateScope()) { await FunAndGames.TestStreamPrompt(scope, "Hello, i enjoy having fun!"); }
 app.Run();

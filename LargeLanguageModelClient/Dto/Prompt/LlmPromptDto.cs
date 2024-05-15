@@ -1,6 +1,6 @@
 ﻿namespace LargeLanguageModelClient.Dto.Prompt;
 
 public record LlmPromptDto(
-    LlmPromptModelDto Model,
+    Guid ModelIdentifier,
     string? SystemMessage,
     List<LlmPromptMessageDto> Messages);

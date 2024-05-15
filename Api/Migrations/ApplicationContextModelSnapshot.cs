@@ -28,6 +28,9 @@ namespace Api.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<long>("ContextTokenCount")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("ImageSupport")
                         .HasColumnType("boolean");
 

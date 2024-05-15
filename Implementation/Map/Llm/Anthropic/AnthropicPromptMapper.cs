@@ -10,7 +10,8 @@ using LargeLanguageModelClient.Dto.Response;
 
 namespace Implementation.Map.Llm.Anthropic;
 
-public class AnthropicPromptMapper(ModelEntity modelEntity)
+public class AnthropicPromptMapper(
+    ModelEntity modelEntity)
 {
     public Result<LlmResponse> Map(AnthropicResponse anthropicResponse)
     {
@@ -67,7 +68,7 @@ public class AnthropicPromptMapper(ModelEntity modelEntity)
             return new MapException($"Model provider is not {nameof(LlmProvider.Anthropic)}");
         }
 
-        if (modelEntity.Id.Value != llmPromptDto.Model.ModelIdentifier)
+        if (modelEntity.Id.Value != llmPromptDto.ModelIdentifier)
         {
             return new MapException("ModelIdentifier does not match modelEntity used for mapping");
         }

@@ -6,6 +6,7 @@ public record LlmModelDto(
     LlmPriceDto Price,
     string ModelIdentifierName,
     long MaxTokenCount,
+    long ContextTokenCount,
     bool ImageSupport,
     bool VideoSupport,
     bool JsonResponseOptimized,

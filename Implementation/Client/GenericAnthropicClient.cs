@@ -13,12 +13,12 @@ namespace Implementation.Client;
 
 public class GenericAnthropicClient(
     ILogger<GenericAnthropicClient> logger,
-    AnthropicClient anthropicClient) : IGenericLlmClient
+    IAnthropicClient anthropicClient) : IGenericLlmClient
 {
     public async Task<Result<LlmResponse>> Prompt(
         LlmPromptDto llmPromptDto,
         ModelEntity modelEntity,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var mapper = new AnthropicPromptMapper(modelEntity);
 
@@ -29,7 +29,7 @@ public class GenericAnthropicClient(
         }
 
         var anthropicPrompt = anthropicPromptResult.Unwrap();
-        var anthropicResult = await anthropicClient.Prompt(anthropicPrompt);
+        var anthropicResult = await anthropicClient.Prompt(anthropicPrompt, cancellationToken);
         if (anthropicResult.IsError)
         {
             return anthropicResult.Error!;
@@ -47,19 +47,19 @@ public class GenericAnthropicClient(
     public async IAsyncEnumerable<LlmStreamEvent> PromptStream(
         LlmPromptDto llmPromptDto,
         ModelEntity modelEntity,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var mapper = new AnthropicPromptMapper(modelEntity);
         var anthropicPromptResult = mapper.Map(llmPromptDto);
         if (anthropicPromptResult.IsError)
         {
             logger.LogCritical(anthropicPromptResult.Error!, "PromptStream Anthropic Prompt Mapping Result was an error");
-            yield return new LlmStreamError("Anthropic PromptStream mapping error");
+            yield return new LlmStreamError("Anthropic PromptStream mapping error. No prompt was made.");
             yield break;
         }
 
         var anthropicPrompt = anthropicPromptResult.Unwrap();
-        var anthropicResult = anthropicClient.PromptStream(anthropicPrompt);
+        var anthropicResult = anthropicClient.PromptStream(anthropicPrompt, cancellationToken);
 
         var streamMapper = new AnthropicStreamMapper(logger, modelEntity);
         await foreach (var llmStreamEvent in streamMapper.MapToLlmStream(anthropicResult, cancellationToken))

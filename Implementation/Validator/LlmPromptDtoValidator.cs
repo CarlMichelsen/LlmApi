@@ -1,5 +1,4 @@
-﻿using Domain.Entity;
-using FluentValidation;
+﻿using FluentValidation;
 using LargeLanguageModelClient;
 using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Prompt.Content;
@@ -15,9 +14,9 @@ public class LlmPromptDtoValidator : AbstractValidator<LlmPromptDto>
 
     public LlmPromptDtoValidator()
     {
-        this.RuleFor(prompt => prompt.Model)
-            .Must(this.HaveValidProviderName)
-            .WithMessage("Prompt model provider is invalid");
+        this.RuleFor(prompt => prompt.ModelIdentifier)
+            .NotEmpty()
+            .WithMessage("Prompt model identifier is invalid");
 
         this.RuleFor(prompt => prompt.Messages)
             .NotEmpty()
@@ -37,12 +36,6 @@ public class LlmPromptDtoValidator : AbstractValidator<LlmPromptDto>
         this.RuleFor(prompt => prompt.Messages)
             .Must(this.HaveAlternatingRoles)
             .WithMessage("Messages must have alternating roles");
-    }
-
-    private bool HaveValidProviderName(LlmPromptModelDto model)
-    {
-        var found = Enum.TryParse<LlmProvider>(model.ProviderName, out var _);
-        return found;
     }
 
     private bool OnlyHaveSupportedImageTypes(LlmPromptMessageDto message)

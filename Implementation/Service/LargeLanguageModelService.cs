@@ -1,10 +1,10 @@
-﻿using Domain.Abstraction;
+﻿using System.Runtime.CompilerServices;
+using Domain.Abstraction;
 using Domain.Entity.Id;
 using Domain.Exception;
 using Implementation.Client;
 using Implementation.Validator;
 using Interface.Repository;
-using Interface.Service;
 using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Response;
 using LargeLanguageModelClient.Dto.Response.Stream;
@@ -16,9 +16,11 @@ namespace Implementation.Service;
 public class LargeLanguageModelService(
     ILogger<LargeLanguageModelService> logger,
     ILlmModelRepository llmModelRepository,
-    GenericLargeLanguageModelClient genericLargeLanguageModelClient) : ILargeLanguageModelService
+    GenericLargeLanguageModelClient genericLargeLanguageModelClient)
 {
-    public async Task<Result<LlmResponse>> Prompt(LlmPromptDto llmPromptDto)
+    public async Task<Result<LlmResponse>> Prompt(
+        LlmPromptDto llmPromptDto,
+        CancellationToken cancellationToken)
     {
         var validator = new LlmPromptDtoValidator();
         var validationResults = validator.Validate(llmPromptDto);
@@ -32,17 +34,19 @@ public class LargeLanguageModelService(
         }
 
         var modelResult = await llmModelRepository
-            .GetModel(new ModelEntityId(llmPromptDto.Model.ModelIdentifier));
+            .GetModel(new ModelEntityId(llmPromptDto.ModelIdentifier));
         if (modelResult.IsError)
         {
             return modelResult.Error!;
         }
 
         return await genericLargeLanguageModelClient
-            .Prompt(llmPromptDto, modelResult.Unwrap());
+            .Prompt(llmPromptDto, modelResult.Unwrap(), cancellationToken);
     }
 
-    public async IAsyncEnumerable<LlmStreamEvent> PromptStream(LlmPromptDto llmPromptDto)
+    public async IAsyncEnumerable<LlmStreamEvent> PromptStream(
+        LlmPromptDto llmPromptDto,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var validator = new LlmPromptDtoValidator();
         var validationResults = validator.Validate(llmPromptDto);
@@ -58,7 +62,7 @@ public class LargeLanguageModelService(
         }
 
         var modelResult = await llmModelRepository
-            .GetModel(new ModelEntityId(llmPromptDto.Model.ModelIdentifier));
+            .GetModel(new ModelEntityId(llmPromptDto.ModelIdentifier));
         if (modelResult.IsError)
         {
             logger.LogCritical(modelResult.Error!, "Failed to get model for prompt");
@@ -67,7 +71,7 @@ public class LargeLanguageModelService(
         }
 
         var stream = genericLargeLanguageModelClient
-            .PromptStream(llmPromptDto, modelResult.Unwrap());
+            .PromptStream(llmPromptDto, modelResult.Unwrap(), cancellationToken);
         await foreach (var item in stream)
         {
             yield return item; 

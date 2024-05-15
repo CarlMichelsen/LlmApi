@@ -14,6 +14,8 @@ public class ModelEntity
 
     public required long MaxTokenCount { get; init; }
 
+    public required long ContextTokenCount { get; init; }
+
     public required bool ImageSupport { get; init; }
 
     public required bool VideoSupport { get; init; }

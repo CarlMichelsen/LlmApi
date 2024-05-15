@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240513194103_InitialCreate")]
+    [Migration("20240514141335_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -30,6 +30,9 @@ namespace Api.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
+
+                    b.Property<long>("ContextTokenCount")
+                        .HasColumnType("bigint");
 
                     b.Property<bool>("ImageSupport")
                         .HasColumnType("boolean");

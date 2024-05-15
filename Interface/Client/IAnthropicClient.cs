@@ -6,7 +6,11 @@ namespace Interface.Client;
 
 public interface IAnthropicClient
 {
-    Task<Result<AnthropicResponse>> Prompt(AnthropicPrompt anthropicPrompt, CancellationToken cancellationToken = default);
+    Task<Result<AnthropicResponse>> Prompt(
+        AnthropicPrompt anthropicPrompt,
+        CancellationToken cancellationToken);
 
-    IAsyncEnumerable<Result<AnthropicStreamEvent>> PromptStream(AnthropicPrompt anthropicPrompt, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<Result<AnthropicStreamEvent>> PromptStream(
+        AnthropicPrompt anthropicPrompt,
+        CancellationToken cancellationToken);
 }

@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Domain.Abstraction;
 using Domain.Dto.Anthropic;
-using Domain.Dto.Anthropic.Content;
 using Domain.Dto.Anthropic.Response.Stream;
 using Domain.Model;
 using Implementation.Json;
@@ -22,7 +21,7 @@ public class AnthropicClient(
     private const string ApiKeyHeaderName = "x-api-key";
     private const string MessagesApi = "v1/messages";
 
-    private static JsonSerializerOptions options = new()
+    private static readonly JsonSerializerOptions Options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
         Converters =
@@ -33,7 +32,7 @@ public class AnthropicClient(
 
     public async Task<Result<AnthropicResponse>> Prompt(
         AnthropicPrompt anthropicPrompt,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var apiKeyResult = await llmApiKeyService.GetApiKey(Domain.Entity.LlmProvider.Anthropic);
         if (apiKeyResult.IsError)
@@ -57,10 +56,10 @@ public class AnthropicClient(
                 }
 
                 var res = resResult.Unwrap();
-                var deserialized = await res.Content.ReadFromJsonAsync<AnthropicResponse>(options);
+                var deserialized = await res.Content.ReadFromJsonAsync<AnthropicResponse>(Options);
                 return deserialized!;
             }
-            catch (JsonException e)
+            catch (Exception e)
             {
                 return e;
             }
@@ -69,7 +68,7 @@ public class AnthropicClient(
 
     public async IAsyncEnumerable<Result<AnthropicStreamEvent>> PromptStream(
         AnthropicPrompt anthropicPrompt,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var apiKeyResult = await llmApiKeyService.GetApiKey(Domain.Entity.LlmProvider.Anthropic);
         if (apiKeyResult.IsError)
@@ -82,7 +81,7 @@ public class AnthropicClient(
             anthropicPrompt = anthropicPrompt with { Stream = true };
         }
 
-        var anthropicStreamHandler = new AnthropicStreamHandler(streamLineReader);
+        var anthropicStreamReader = new AnthropicStreamReader(streamLineReader);
         await using (var apiKey = apiKeyResult.Unwrap())
         {
             var responseResult = await this.Request(anthropicPrompt, apiKey!, cancellationToken, true);
@@ -96,7 +95,7 @@ public class AnthropicClient(
                 .Unwrap().Content
                 .ReadAsStream(cancellationToken);
             
-            await foreach (var anthropicEventResult in anthropicStreamHandler.ReadLine(httpResponseStream))
+            await foreach (var anthropicEventResult in anthropicStreamReader.Read(httpResponseStream, cancellationToken))
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -118,14 +117,13 @@ public class AnthropicClient(
     private async Task<Result<HttpResponseMessage>> Request(
         AnthropicPrompt anthropicPrompt,
         ReservableApiKey apiKey,
-        CancellationToken cancellationToken = default,
+        CancellationToken cancellationToken,
         bool stream = false)
     {
         try
         {
-            httpClient.DefaultRequestHeaders.Remove(ApiKeyHeaderName);
             httpClient.DefaultRequestHeaders.Add(ApiKeyHeaderName, apiKey.ApiKey);
-            var json = JsonSerializer.Serialize(anthropicPrompt, options);
+            var json = JsonSerializer.Serialize(anthropicPrompt, Options);
             var payload = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             var msg = new HttpRequestMessage
             {
@@ -134,6 +132,7 @@ public class AnthropicClient(
                 RequestUri = new Uri(httpClient.BaseAddress!, MessagesApi),
             };
             var res = await httpClient.SendAsync(msg, stream ? HttpCompletionOption.ResponseHeadersRead : HttpCompletionOption.ResponseContentRead, cancellationToken);
+            httpClient.DefaultRequestHeaders.Remove(ApiKeyHeaderName);
             res.EnsureSuccessStatusCode();
 
             return res;

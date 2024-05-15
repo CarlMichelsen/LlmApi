@@ -8,17 +8,21 @@ namespace UnitTest.LargeLanguageModelClient.Fakes;
 
 public class FakeGenericLargeLanguageModelClient : GenericLargeLanguageModelClient
 {
+    private readonly string testFileName;
+
     public FakeGenericLargeLanguageModelClient(
-        ILogger<GenericLargeLanguageModelClient> logger,
-        IServiceProvider serviceProvider)
-        : base(logger, serviceProvider)
+        IServiceProvider serviceProvider,
+        string testFileName)
+        : base(serviceProvider)
     {
+        this.testFileName = testFileName;
     }
 
     public override IGenericLlmClient GetGenericLlmClient(LlmProvider llmProvider)
     => llmProvider switch
         {
-            LlmProvider.Anthropic => new GenericAnthropicClient(CreateFakeLogger<GenericAnthropicClient>(), FakeAnthropicClientFactory.Create()),
+            LlmProvider.Anthropic => new GenericAnthropicClient(CreateFakeLogger<GenericAnthropicClient>(), FakeAnthropicClientFactory.Create(this.testFileName)),
+            LlmProvider.OpenAi => new GenericOpenAiClient(CreateFakeLogger<GenericOpenAiClient>(), FakeOpenAiClientFactory.Create(this.testFileName)),
             _ => throw new NotImplementedException($"No fake client implemented for {nameof(llmProvider)}"),
         };
     

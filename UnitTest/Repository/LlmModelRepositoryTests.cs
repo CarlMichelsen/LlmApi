@@ -154,6 +154,7 @@ public class LlmModelRepositoryTests : DatabaseTest
             },
             ModelIdentifierName = "TestModel",
             MaxTokenCount = random.NextInt64(4032, 8064),
+            ContextTokenCount = random.NextInt64(8064, 8064 * 2),
             ImageSupport = random.Next(1) == 0,
             VideoSupport = random.Next(1) == 0,
             JsonResponseOptimized = random.Next(1) == 0,

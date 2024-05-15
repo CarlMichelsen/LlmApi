@@ -5,6 +5,7 @@ using Implementation.Handler;
 using Implementation.Json.Reader;
 using Implementation.Repository;
 using Implementation.Service;
+using Interface.Client;
 using Interface.Handler;
 using Interface.Json;
 using Interface.Repository;
@@ -34,6 +35,8 @@ public static class Dependencies
         // Configuration
         builder.Configuration.AddJsonFile("secrets.json", optional: false, reloadOnChange: true);
         builder.Services
+            .Configure<AdminOptions>(builder.Configuration.GetSection(AdminOptions.SectionName))
+            .Configure<OpenAiOptions>(builder.Configuration.GetSection(OpenAiOptions.SectionName))
             .Configure<AnthropicOptions>(builder.Configuration.GetSection(AnthropicOptions.SectionName));
         
         // Json
@@ -47,23 +50,32 @@ public static class Dependencies
         // Repository
         builder.Services
             .AddScoped<ILlmModelRepository, LlmModelRepository>()
-            .AddScoped<ILargeLanguageModelService, LargeLanguageModelService>();
+            .AddScoped<IPromptRepository, PromptRepository>();
 
         // Service
         builder.Services
             .AddScoped<ILlmModelService, LlmModelService>()
-            .AddScoped<ILlmApiKeyService, LlmApiKeyService>();
+            .AddScoped<ILlmApiKeyService, LlmApiKeyService>()
+            .AddScoped<LargeLanguageModelService>()
+            .AddScoped<ILargeLanguageModelService, TrackedLargeLanguageModelService>();
         
         // Clients
-        builder.Services.AddHttpClient<AnthropicClient>((sp, client) =>
+        builder.Services.AddHttpClient<IAnthropicClient, AnthropicClient>((sp, client) =>
         {
             var anthropicOptions = sp.GetRequiredService<IOptions<AnthropicOptions>>();
             client.BaseAddress = new Uri(anthropicOptions.Value.ApiBaseUrl);
             client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
         });
 
+        builder.Services.AddHttpClient<IOpenAiClient, OpenAiClient>((sp, client) =>
+        {
+            var openAiOptions = sp.GetRequiredService<IOptions<OpenAiOptions>>();
+            client.BaseAddress = new Uri(openAiOptions.Value.ApiBaseUrl);
+        });
+
         builder.Services
             .AddScoped<GenericAnthropicClient>()
+            .AddScoped<GenericOpenAiClient>()
             .AddScoped<GenericLargeLanguageModelClient>();
         
         // Middleware

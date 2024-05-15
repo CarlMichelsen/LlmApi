@@ -38,6 +38,7 @@ namespace Api.Migrations
                     Provider = table.Column<int>(type: "integer", nullable: false),
                     ModelIdentifierName = table.Column<string>(type: "text", nullable: false),
                     MaxTokenCount = table.Column<long>(type: "bigint", nullable: false),
+                    ContextTokenCount = table.Column<long>(type: "bigint", nullable: false),
                     ImageSupport = table.Column<bool>(type: "boolean", nullable: false),
                     VideoSupport = table.Column<bool>(type: "boolean", nullable: false),
                     JsonResponseOptimized = table.Column<bool>(type: "boolean", nullable: false),

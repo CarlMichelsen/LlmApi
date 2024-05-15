@@ -15,4 +15,9 @@ public class LlmImageContent : LlmContent
     /// Gets image data.
     /// </summary>
     public required string Data { get; init; }
+
+    public override string GetContent()
+    {
+        return this.Data;
+    }
 }

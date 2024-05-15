@@ -8,4 +8,5 @@ public record LlmResponse(
     string ModelIdentifierName,
     LlmPromptMessageDto Message,
     LlmUsage Usage,
-    string? StopReason);
+    string? StopReason,
+    string? DetailedModelIdentifierName = default);

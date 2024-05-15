@@ -1,38 +1,38 @@
 ﻿using Domain.Entity;
 using Domain.Entity.Id;
-using Implementation.Client;
 using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Prompt.Content;
 using LargeLanguageModelClient.Dto.Response.Stream;
 using LargeLanguageModelClient.Dto.Response.Stream.Event;
-using Microsoft.Extensions.Logging;
 using Moq;
 using UnitTest.LargeLanguageModelClient.Fakes;
 
 namespace UnitTest.LargeLanguageModelClient;
 
-public class LargeLanguageModelClientTests
+public class GenericLargeLanguageModelClientTests
 {
-    private readonly FakeGenericLargeLanguageModelClient client;
+    private readonly Mock<IServiceProvider> mockServiceProvider;
 
-    public LargeLanguageModelClientTests()
+    public GenericLargeLanguageModelClientTests()
     {
-        var loggerMock = new Mock<ILogger<GenericLargeLanguageModelClient>>();
-        var serviceProviderMock = new Mock<IServiceProvider>();
-        this.client = new FakeGenericLargeLanguageModelClient(loggerMock.Object, serviceProviderMock.Object);
+        this.mockServiceProvider = new();
     }
 
     [Theory]
-    [InlineData(LlmProvider.Anthropic)]
-    public async Task ShouldFinnishWithTotalUsageEvent(LlmProvider llmProvider)
+    [InlineData(LlmProvider.Anthropic, "anthropic-14-05-2024-10-05-13.txt")]
+    [InlineData(LlmProvider.Anthropic, "anthropic-stream-response.txt")]
+    [InlineData(LlmProvider.OpenAi, "openai-14-05-2024-09-45-37.txt")]
+    [InlineData(LlmProvider.OpenAi, "openai-14-05-2024-10-21-53.txt")]
+    public async Task ShouldFinnishWithTotalUsageEvent(LlmProvider llmProvider, string testFileName)
     {
         // Arrange
+        var client = new FakeGenericLargeLanguageModelClient(this.mockServiceProvider.Object, testFileName);
         var prompt = this.MockPrompt(Enum.GetName(llmProvider)!);
-        var model = this.MockModel(prompt.Model.ModelIdentifier, LlmProvider.Anthropic);
+        var model = this.MockModel(prompt.ModelIdentifier, LlmProvider.Anthropic);
         LlmStreamEvent? lastEvent = default;
 
         // Act
-        await foreach (var streamEvent in this.client.PromptStream(prompt, model))
+        await foreach (var streamEvent in client.PromptStream(prompt, model, CancellationToken.None))
         {
             lastEvent = streamEvent;
         }
@@ -44,19 +44,49 @@ public class LargeLanguageModelClientTests
     }
 
     [Theory]
-    [InlineData(LlmProvider.Anthropic)]
-    public async Task ShouldFinnishWithTotalUsageEventEvenWhenCancelled(LlmProvider llmProvider)
+    [InlineData(LlmProvider.Anthropic, "anthropic-with-error-14-05-2024-10-43-56.txt")]
+    [InlineData(LlmProvider.OpenAi, "openai-with-error-15-05-2024-15-05-28.txt")]
+    public async Task ShouldGracefullyHandleErrors(LlmProvider llmProvider, string testFileName)
     {
         // Arrange
+        var client = new FakeGenericLargeLanguageModelClient(this.mockServiceProvider.Object, testFileName);
         var prompt = this.MockPrompt(Enum.GetName(llmProvider)!);
-        var model = this.MockModel(prompt.Model.ModelIdentifier, llmProvider);
-        LlmStreamEvent? lastEvent = default;
+        var model = this.MockModel(prompt.ModelIdentifier, llmProvider);
+        var allEvents = new List<LlmStreamEvent>();
+
+        // Act
+        await foreach (var streamEvent in client.PromptStream(prompt, model, CancellationToken.None))
+        {
+            allEvents.Add(streamEvent);
+        }
+
+        var strList = allEvents.Select(e => e.TypeName).ToList();
+
+        // Arrange
+        Assert.NotEmpty(allEvents);
+        Assert.IsType<LlmStreamError>(allEvents[^2]);
+        Assert.IsType<LlmStreamTotalUsage>(allEvents[^1]);
+        Assert.Equal(LlmStreamEventType.TotalUsage, allEvents[^1].Type);
+    }
+
+    [Theory]
+    [InlineData(LlmProvider.Anthropic, "anthropic-14-05-2024-10-05-13.txt")]
+    [InlineData(LlmProvider.Anthropic, "anthropic-stream-response.txt")]
+    [InlineData(LlmProvider.OpenAi, "openai-14-05-2024-09-45-37.txt")]
+    [InlineData(LlmProvider.OpenAi, "openai-14-05-2024-10-21-53.txt")]
+    public async Task ShouldFinnishWithTotalUsageEventEvenWhenCancelled(LlmProvider llmProvider, string testFileName)
+    {
+        // Arrange
+        var client = new FakeGenericLargeLanguageModelClient(this.mockServiceProvider.Object, testFileName);
+        var prompt = this.MockPrompt(Enum.GetName(llmProvider)!);
+        var model = this.MockModel(prompt.ModelIdentifier, llmProvider);
+        var allEvents = new List<LlmStreamEvent>();
         var source = new CancellationTokenSource();
-        var max = 10;
+        var max = 5;
         var counter = 0;
 
         // Act
-        await foreach (var streamEvent in this.client.PromptStream(prompt, model, source.Token))
+        await foreach (var streamEvent in client.PromptStream(prompt, model, source.Token))
         {
             counter++;
             if (counter >= max)
@@ -64,21 +94,22 @@ public class LargeLanguageModelClientTests
                 source.Cancel();
             }
 
-            lastEvent = streamEvent;
+            allEvents.Add(streamEvent);
         }
+        
+        source.Dispose();
 
         // Assert
-        Assert.Equal(max + 1, counter); // +1 because there is supposed to be a TotalUsage event even after cancellation.
-        Assert.NotNull(lastEvent);
-        Assert.Equal(LlmStreamEventType.TotalUsage, lastEvent.Type);
-        Assert.IsType<LlmStreamTotalUsage>(lastEvent);
+        Assert.Equal(max + 1, counter); // +1 because there is supposed to be a TotalUsage event after cancellation.
+        Assert.NotNull(allEvents[^1]);
+        Assert.Equal(LlmStreamEventType.TotalUsage, allEvents[^1].Type);
+        Assert.IsNotType<LlmStreamError>(allEvents[^2]);
+        Assert.IsType<LlmStreamTotalUsage>(allEvents[^1]);
     }
 
     private LlmPromptDto MockPrompt(string providerName) =>
         new LlmPromptDto(
-            Model: new LlmPromptModelDto(
-                ProviderName: providerName,
-                ModelIdentifier: Guid.NewGuid()),
+            ModelIdentifier: Guid.NewGuid(),
             SystemMessage: "I'm a fake system message",
             Messages: new List<LlmPromptMessageDto>
             {
@@ -108,6 +139,7 @@ public class LargeLanguageModelClientTests
             },
             ModelIdentifierName = "fake-model-identifier-name",
             MaxTokenCount = 4000,
+            ContextTokenCount = 4000,
             ImageSupport = true,
             VideoSupport = false,
             JsonResponseOptimized = false,

@@ -4,5 +4,5 @@ public interface IStreamLineReader
 {
     IAsyncEnumerable<string> ReadLine(
         Stream stream,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 }

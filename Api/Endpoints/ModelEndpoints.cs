@@ -8,7 +8,9 @@ public static class ModelEndpoints
 {
     public static WebApplication RegisterModelEndpoints(this WebApplication app, RouteGroupBuilder group)
     {
-        var modelGroup = group.MapGroup("model");
+        var modelGroup = group
+            .MapGroup("model")
+            .WithDisplayName("Model");
 
         modelGroup
             .MapGet("/all", (IModelHandler modelHandler) => modelHandler.GetAllModels())

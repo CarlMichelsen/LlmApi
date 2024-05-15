@@ -11,10 +11,10 @@ public interface IGenericLlmClient
     public Task<Result<LlmResponse>> Prompt(
         LlmPromptDto llmPromptDto,
         ModelEntity modelEntity,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 
     public IAsyncEnumerable<LlmStreamEvent> PromptStream(
         LlmPromptDto llmPromptDto,
         ModelEntity modelEntity,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 }
