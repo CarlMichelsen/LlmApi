@@ -6,6 +6,8 @@ public class ModelEntity
 {
     public required ModelEntityId Id { get; init; }
 
+    public required bool Available { get; init; }
+
     public required LlmProvider Provider { get; init; }
 
     public required PriceEntity Price { get; init; }

@@ -19,6 +19,8 @@ public sealed class ApplicationContext : DbContext
     {
     }
 
+    public DbSet<PromptEntity> PromptEntity { get; init; }
+
     public DbSet<ModelEntity> ModelEntity { get; init; }
     
     public DbSet<PriceEntity> PriceEntity { get; init; }

@@ -2,6 +2,7 @@
 
 public record LlmModelDto(
     Guid Id,
+    bool Available,
     string ProviderName,
     LlmPriceDto Price,
     string ModelIdentifierName,

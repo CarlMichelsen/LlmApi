@@ -27,8 +27,8 @@ public class GenericLargeLanguageModelClientTests
     {
         // Arrange
         var client = new FakeGenericLargeLanguageModelClient(this.mockServiceProvider.Object, testFileName);
-        var prompt = this.MockPrompt(Enum.GetName(llmProvider)!);
-        var model = this.MockModel(prompt.ModelIdentifier, LlmProvider.Anthropic);
+        var prompt = this.MockPrompt();
+        var model = this.MockModel(prompt.ModelIdentifier, llmProvider);
         LlmStreamEvent? lastEvent = default;
 
         // Act
@@ -50,7 +50,7 @@ public class GenericLargeLanguageModelClientTests
     {
         // Arrange
         var client = new FakeGenericLargeLanguageModelClient(this.mockServiceProvider.Object, testFileName);
-        var prompt = this.MockPrompt(Enum.GetName(llmProvider)!);
+        var prompt = this.MockPrompt();
         var model = this.MockModel(prompt.ModelIdentifier, llmProvider);
         var allEvents = new List<LlmStreamEvent>();
 
@@ -59,8 +59,6 @@ public class GenericLargeLanguageModelClientTests
         {
             allEvents.Add(streamEvent);
         }
-
-        var strList = allEvents.Select(e => e.TypeName).ToList();
 
         // Arrange
         Assert.NotEmpty(allEvents);
@@ -78,7 +76,7 @@ public class GenericLargeLanguageModelClientTests
     {
         // Arrange
         var client = new FakeGenericLargeLanguageModelClient(this.mockServiceProvider.Object, testFileName);
-        var prompt = this.MockPrompt(Enum.GetName(llmProvider)!);
+        var prompt = this.MockPrompt();
         var model = this.MockModel(prompt.ModelIdentifier, llmProvider);
         var allEvents = new List<LlmStreamEvent>();
         var source = new CancellationTokenSource();
@@ -107,7 +105,7 @@ public class GenericLargeLanguageModelClientTests
         Assert.IsType<LlmStreamTotalUsage>(allEvents[^1]);
     }
 
-    private LlmPromptDto MockPrompt(string providerName) =>
+    private LlmPromptDto MockPrompt() =>
         new LlmPromptDto(
             ModelIdentifier: Guid.NewGuid(),
             SystemMessage: "I'm a fake system message",
@@ -129,6 +127,7 @@ public class GenericLargeLanguageModelClientTests
         return new ModelEntity
         {
             Id = new ModelEntityId(identifier),
+            Available = true,
             Provider = provider,
             Price = new PriceEntity
             {

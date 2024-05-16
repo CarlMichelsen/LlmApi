@@ -1,25 +1,23 @@
 ﻿using System.Runtime.CompilerServices;
 using Domain.Abstraction;
+using Domain.Entity;
 using Domain.Entity.Id;
 using Domain.Exception;
 using Implementation.Client;
 using Implementation.Validator;
-using Interface.Repository;
 using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Response;
 using LargeLanguageModelClient.Dto.Response.Stream;
 using LargeLanguageModelClient.Dto.Response.Stream.Event;
-using Microsoft.Extensions.Logging;
 
 namespace Implementation.Service;
 
 public class LargeLanguageModelService(
-    ILogger<LargeLanguageModelService> logger,
-    ILlmModelRepository llmModelRepository,
     GenericLargeLanguageModelClient genericLargeLanguageModelClient)
 {
     public async Task<Result<LlmResponse>> Prompt(
         LlmPromptDto llmPromptDto,
+        ModelEntity modelEntity,
         CancellationToken cancellationToken)
     {
         var validator = new LlmPromptDtoValidator();
@@ -33,19 +31,13 @@ public class LargeLanguageModelService(
             return new SafeUserFeedbackException("Invalid prompt", errorStrings);
         }
 
-        var modelResult = await llmModelRepository
-            .GetModel(new ModelEntityId(llmPromptDto.ModelIdentifier));
-        if (modelResult.IsError)
-        {
-            return modelResult.Error!;
-        }
-
         return await genericLargeLanguageModelClient
-            .Prompt(llmPromptDto, modelResult.Unwrap(), cancellationToken);
+            .Prompt(llmPromptDto, modelEntity, cancellationToken);
     }
 
     public async IAsyncEnumerable<LlmStreamEvent> PromptStream(
         LlmPromptDto llmPromptDto,
+        ModelEntity modelEntity,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var validator = new LlmPromptDtoValidator();
@@ -61,17 +53,8 @@ public class LargeLanguageModelService(
             yield break;
         }
 
-        var modelResult = await llmModelRepository
-            .GetModel(new ModelEntityId(llmPromptDto.ModelIdentifier));
-        if (modelResult.IsError)
-        {
-            logger.LogCritical(modelResult.Error!, "Failed to get model for prompt");
-            yield return new LlmStreamError($"Invalid model identifier");
-            yield break;
-        }
-
         var stream = genericLargeLanguageModelClient
-            .PromptStream(llmPromptDto, modelResult.Unwrap(), cancellationToken);
+            .PromptStream(llmPromptDto, modelEntity, cancellationToken);
         await foreach (var item in stream)
         {
             yield return item; 

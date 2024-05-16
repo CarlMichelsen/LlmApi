@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using LargeLanguageModelClient;
 using LargeLanguageModelClient.Dto.Prompt.Content;
 
 namespace Implementation.Json;
@@ -16,11 +17,11 @@ public class LlmContentConverter : JsonConverter<LlmContent>
         using (var jsonDoc = JsonDocument.ParseValue(ref reader))
         {
             var root = jsonDoc.RootElement;
-            var typeDiscriminator = root.GetProperty("type").GetString();
-            var actualType = typeDiscriminator switch
+            var contentType = (LlmContentType)root.GetProperty("type").GetInt32();
+            var actualType = contentType switch
             {
-                "text" => typeof(LlmTextContent),
-                "image" => typeof(LlmImageContent),
+                LlmContentType.Text => typeof(LlmTextContent),
+                LlmContentType.Image => typeof(LlmImageContent),
                 _ => throw new JsonException("Unknown LlmContent type."),
             };
 

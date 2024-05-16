@@ -18,5 +18,5 @@ public class ServiceResponse<T>
 
     public List<string> Errors { get; init; } = new();
 
-    public DateTime SentUtc => DateTime.UtcNow;
+    public DateTime ResponseSentUtc => DateTime.UtcNow;
 }

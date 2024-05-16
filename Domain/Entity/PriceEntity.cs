@@ -13,12 +13,12 @@ public class PriceEntity
     /// Currency is american dollars.
     /// </summary>
     /// <value>Cents (American dollar).</value>
-    public required long MillionInputTokenPrice { get; init; }
+    public required int MillionInputTokenPrice { get; init; }
 
     /// <summary>
     /// Gets price of one million OUTPUT tokens in cents.
     /// Currency is american dollars.
     /// </summary>
     /// <value>Cents (American dollar).</value>
-    public required long MillionOutputTokenPrice { get; init; }
+    public required int MillionOutputTokenPrice { get; init; }
 }

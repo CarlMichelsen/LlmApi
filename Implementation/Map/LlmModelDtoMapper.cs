@@ -18,6 +18,7 @@ public static class LlmModelDtoMapper
 
         return new LlmModelDto(
             Id: modelEntity.Id.Value,
+            Available: modelEntity.Available,
             ProviderName: providerName,
             Price: new LlmPriceDto(
                 Id: modelEntity.Price.Id.Value,
@@ -46,6 +47,7 @@ public static class LlmModelDtoMapper
         return new ModelEntity
         {
             Id = modelEntityId,
+            Available = modelDto.Available,
             Provider = result,
             Price = new PriceEntity
             {

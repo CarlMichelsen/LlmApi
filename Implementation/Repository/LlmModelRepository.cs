@@ -17,7 +17,7 @@ public class LlmModelRepository(
     {
         var exsisting = await applicationContext.ModelEntity
             .Include(m => m.Price)
-            .FirstOrDefaultAsync(m => m.Id == modelEntity.Id);
+            .FirstOrDefaultAsync(m => m.Id == modelEntity.Id); 
         if (exsisting is not null)
         {
             return new SafeUserFeedbackException("Model already exsists");
@@ -90,7 +90,6 @@ public class LlmModelRepository(
         }
 
         applicationContext.Entry(entity).State = EntityState.Detached;
-
         return entity;
     }
 
@@ -126,7 +125,10 @@ public class LlmModelRepository(
                     applicationContext.ModelEntity.RemoveRange(entities);
                 }
 
-                var prices = applicationContext.PriceEntity.ToList();
+                var prices = applicationContext.ModelEntity
+                    .Include(m => m.Price)
+                    .Select(m => m.Price)
+                    .ToList();
                 if (prices.Count != 0)
                 {
                     applicationContext.PriceEntity.RemoveRange(prices);
@@ -170,7 +172,7 @@ public class LlmModelRepository(
                 if (deleted == 0)
                 {
                     await transaction.RollbackAsync();
-                    return new SafeUserFeedbackException("No rows were affected in the database (RM)");
+                    return new SafeUserFeedbackException("No rows were affected in the database", "The remove part failed");
                 }
 
                 applicationContext.ModelEntity.Add(modelEntity);
@@ -179,7 +181,7 @@ public class LlmModelRepository(
                 if (affected == 0)
                 {
                     await transaction.RollbackAsync();
-                    return new SafeUserFeedbackException("No rows were affected in the database (UP)");
+                    return new SafeUserFeedbackException("No rows were affected in the database", "The insert part failed");
                 }
 
                 await transaction.CommitAsync();

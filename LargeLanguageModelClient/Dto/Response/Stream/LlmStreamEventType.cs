@@ -9,19 +9,19 @@ public enum LlmStreamEventType
 
     /// <summary>
     /// Start of a content item for a message.
-    /// Messages can have multiple content blocks so there is also an id.
+    /// Messages can have multiple content items so there is also an id.
     /// </summary>
     ContentStart = 2000,
 
     /// <summary>
     /// Content chunk of an exsisting content item.
-    /// Messages can have multiple content blocks so there is also an id.
+    /// Messages can have multiple content items so there is also an id.
     /// </summary>
     ContentDelta = 3000,
 
     /// <summary>
     /// Indicates that a content item has finnished streaming.
-    /// Messages can have multiple content blocks so there is also an id.
+    /// Messages can have multiple content items so there is also an id.
     /// </summary>
     ContentStop = 4000,
 

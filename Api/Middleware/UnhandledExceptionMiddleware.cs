@@ -1,4 +1,4 @@
-﻿namespace Api;
+﻿namespace Api.Middleware;
 
 public sealed class UnhandledExceptionMiddleware(
     ILogger<UnhandledExceptionMiddleware> logger) : IMiddleware

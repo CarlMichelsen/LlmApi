@@ -100,8 +100,7 @@ public class OpenAiStreamResponseMappingHandler(
         {
             ProviderPromptIdentifier = this.lastKnownProviderPromptIdentifier,
             InputTokens = useInputEstimate ? (long)this.EstimatePromptTokens() : this.inputTokens,
-            OutputTokens = this.outputTokens,
-            EstimatedOutputTokens = (long)this.estimatedOutputTokens,
+            OutputTokens = this.outputTokens == 0 ? (long)this.estimatedOutputTokens : this.outputTokens,
             StopReason = stopReason ?? "halt",
         };
     }

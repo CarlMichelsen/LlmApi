@@ -41,7 +41,7 @@ public class LlmModelService(
 
     public async Task<Result<LlmModelDto>> DeleteModel(Guid id)
     {
-        var modelResult = await llmModelRepository.DeleteModel(new ModelEntityId(id));
+        var modelResult = await llmModelRepository.DeleteModel(new Domain.Entity.Id.ModelEntityId(id));
         if (modelResult.IsError)
         {
             return modelResult.Error!;
@@ -65,7 +65,7 @@ public class LlmModelService(
 
     public async Task<Result<LlmModelDto>> GetModel(Guid id)
     {
-        var modelResult = await llmModelRepository.GetModel(new ModelEntityId(id));
+        var modelResult = await llmModelRepository.GetModel(new Domain.Entity.Id.ModelEntityId(id));
         if (modelResult.IsError)
         {
             return modelResult.Error!;

@@ -2,5 +2,5 @@
 
 public record LlmPriceDto(
     Guid Id,
-    long MillionInputTokenPrice,
-    long MillionOutputTokenPrice);
+    int MillionInputTokenPrice,
+    int MillionOutputTokenPrice);

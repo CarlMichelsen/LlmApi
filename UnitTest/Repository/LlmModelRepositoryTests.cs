@@ -38,7 +38,7 @@ public class LlmModelRepositoryTests : DatabaseTest
     public async Task SetModelsTransactionShouldRollbackOnFailure()
     {
         // Arrange
-        var initialSetList = new List<ModelEntity>
+        var initialSetList = new List<Domain.Entity.ModelEntity>
         {
             this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
             this.MockModelEntity(Guid.NewGuid(), Guid.NewGuid()),
@@ -51,7 +51,7 @@ public class LlmModelRepositoryTests : DatabaseTest
 
         // Act
         var identifier = Guid.NewGuid();
-        var invalidModels = new List<ModelEntity>
+        var invalidModels = new List<Domain.Entity.ModelEntity>
         {
             this.MockModelEntity(identifier, Guid.NewGuid()),
             this.MockModelEntity(identifier, Guid.NewGuid()),
@@ -144,13 +144,14 @@ public class LlmModelRepositoryTests : DatabaseTest
         return new ModelEntity
         {
             Id = modelEntityId,
+            Available = true,
             Provider = RandomEnum<LlmProvider>(random),
             Price = new PriceEntity
             {
                 Id = new PriceEntityId(priceIdentifier),
                 ModelId = modelEntityId,
-                MillionInputTokenPrice = random.NextInt64(50, 2000),
-                MillionOutputTokenPrice = random.NextInt64(50, 4000),
+                MillionInputTokenPrice = random.Next(50, 2000),
+                MillionOutputTokenPrice = random.Next(50, 4000),
             },
             ModelIdentifierName = "TestModel",
             MaxTokenCount = random.NextInt64(4032, 8064),

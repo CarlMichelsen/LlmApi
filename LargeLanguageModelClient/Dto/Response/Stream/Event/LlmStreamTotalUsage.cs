@@ -8,9 +8,7 @@ public class LlmStreamTotalUsage : LlmStreamEvent
 
     public required long InputTokens { get; init; }
 
-    public required long? OutputTokens { get; init; }
-
-    public required long EstimatedOutputTokens { get; init; }
+    public required long OutputTokens { get; init; }
 
     public required string StopReason { get; init; }
 }

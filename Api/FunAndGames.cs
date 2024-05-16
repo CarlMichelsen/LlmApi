@@ -52,7 +52,7 @@ public static class FunAndGames
                 }
             }
 
-            Console.WriteLine(JsonSerializer.Serialize((dynamic)streamEvent, new JsonSerializerOptions { Converters = { new LlmContentConverter() } }));
+            Console.WriteLine(JsonSerializer.Serialize((dynamic)streamEvent, JsonSerializerOptionsHelper.LlmContentOptions));
         }
 
         Console.WriteLine(sb.ToString());
@@ -83,15 +83,7 @@ public static class FunAndGames
             throw result.Error!;
         }
 
-        var jsonString = JsonSerializer.Serialize(result.Unwrap(), new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters =
-            {
-                new LlmContentConverter(),
-            },
-        });
-
+        var jsonString = JsonSerializer.Serialize(result.Unwrap(), JsonSerializerOptionsHelper.LlmContentOptions);
         Console.WriteLine(jsonString);
     }
 

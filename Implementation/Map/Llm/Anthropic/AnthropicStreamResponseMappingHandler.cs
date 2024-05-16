@@ -96,8 +96,7 @@ public class AnthropicStreamResponseMappingHandler(
         {
             ProviderPromptIdentifier = this.providerPromptIdentifier ?? "NoIdentifier",
             InputTokens = this.inputTokens,
-            OutputTokens = this.outputTokens,
-            EstimatedOutputTokens = (long)this.outputTokensEstimate,
+            OutputTokens = this.outputTokens == 0 ? (long)this.outputTokensEstimate : this.outputTokens ?? 0,
             StopReason = this.stopReason ?? "None",
         };
     }

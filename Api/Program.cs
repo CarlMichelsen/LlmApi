@@ -1,5 +1,5 @@
 using Api;
-using Api.Endpoints;
+using Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,11 +21,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<UnhandledExceptionMiddleware>();
 
-var apiGroup = app.MapGroup("api/v1");
+app.UseMiddleware<BasicAuthenticationHandler>();
 
-app.RegisterModelEndpoints(apiGroup);
-
-apiGroup.WithOpenApi();
+app.UseApplicationEndpoints();
 
 // using (var scope = app.Services.CreateScope()) { await FunAndGames.TestStreamPrompt(scope, "Hello, i enjoy having fun!"); }
 app.Run();
