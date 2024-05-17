@@ -42,6 +42,8 @@ public static class Dependencies
         // Configuration
         builder.Configuration.AddJsonFile("secrets.json", optional: false, reloadOnChange: true);
         builder.Services
+            .Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName))
+            .Configure<DiscordOptions>(builder.Configuration.GetSection(DiscordOptions.SectionName))
             .Configure<CredentialsOptions>(builder.Configuration.GetSection(CredentialsOptions.SectionName))
             .Configure<OpenAiOptions>(builder.Configuration.GetSection(OpenAiOptions.SectionName))
             .Configure<AnthropicOptions>(builder.Configuration.GetSection(AnthropicOptions.SectionName))
@@ -53,15 +55,17 @@ public static class Dependencies
             });
         
         // Serilog Configuration
-        var discordConfiguration = builder.Configuration.GetSection(DiscordOptions.SectionName);
         builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
         {
-            var id = ulong.Parse(discordConfiguration[nameof(DiscordOptions.WebhookId)]!);
-            var token = discordConfiguration[nameof(DiscordOptions.WebhookToken)]!;
+            var discordConfiguration = builder.Configuration
+                .GetSection(DiscordOptions.SectionName)
+                .Get<DiscordOptions>()!;
+
+            var id = ulong.Parse(discordConfiguration.WebhookId);
             loggerConfiguration
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
-                .WriteTo.Discord(id, token, restrictedToMinimumLevel: LogEventLevel.Fatal)
+                .WriteTo.Discord(id, discordConfiguration.WebhookToken, restrictedToMinimumLevel: LogEventLevel.Fatal)
                 .ReadFrom.Configuration(hostingContext.Configuration);
         });
         
@@ -82,8 +86,9 @@ public static class Dependencies
 
         // Service
         builder.Services
+            .AddScoped<ICacheService, CacheService>()
             .AddScoped<ILlmModelService, LlmModelService>()
-            .AddScoped<ILlmApiKeyService, LlmApiKeyService>()
+            .AddScoped<ILlmApiKeyService, LlmDistributedApiKeyService>()
             .AddScoped<LargeLanguageModelService>()
             .AddScoped<ILargeLanguageModelService, TrackedLargeLanguageModelService>()
             .AddScoped<IHttpPromptStreamService, HttpPromptStreamService>();
@@ -107,6 +112,17 @@ public static class Dependencies
             .AddScoped<GenericOpenAiClient>()
             .AddScoped<GenericLargeLanguageModelClient>();
         
+        // Cache
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {
+            var redisConfiguration = builder.Configuration
+                .GetSection(RedisOptions.SectionName)
+                .Get<RedisOptions>()!;
+
+            options.Configuration = redisConfiguration.ConnectionString;
+            options.InstanceName = redisConfiguration.InstanceName;
+        });
+
         // Middleware
         builder.Services
             .AddHttpContextAccessor()
