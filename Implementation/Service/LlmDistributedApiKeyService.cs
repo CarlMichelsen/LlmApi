@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 namespace Implementation.Service;
 
 public class LlmDistributedApiKeyService(
-    ILogger<LlmApiKeyService> logger,
+    ILogger<LlmDistributedApiKeyService> logger,
     IOptions<OpenAiOptions> openAiOptions,
     IOptions<AnthropicOptions> anthropicOptions,
     ICacheService cacheService) : ILlmApiKeyService
