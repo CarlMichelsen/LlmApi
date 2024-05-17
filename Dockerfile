@@ -16,7 +16,7 @@ FROM build AS publish
 
 RUN dotnet publish "./Api" -c Release --output /app/publish
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
 WORKDIR /app
 

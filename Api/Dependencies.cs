@@ -16,6 +16,9 @@ using Interface.Service;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Discord;
 
 namespace Api;
 
@@ -48,6 +51,19 @@ public static class Dependencies
                 options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.SerializerOptions.MaxDepth = 30;
             });
+        
+        // Serilog Configuration
+        var discordConfiguration = builder.Configuration.GetSection(DiscordOptions.SectionName);
+        builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
+        {
+            var id = ulong.Parse(discordConfiguration[nameof(DiscordOptions.WebhookId)]!);
+            var token = discordConfiguration[nameof(DiscordOptions.WebhookToken)]!;
+            loggerConfiguration
+                .MinimumLevel.Debug()
+                .Enrich.FromLogContext()
+                .WriteTo.Discord(id, token, restrictedToMinimumLevel: LogEventLevel.Fatal)
+                .ReadFrom.Configuration(hostingContext.Configuration);
+        });
         
         // Json
         builder.Services

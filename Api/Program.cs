@@ -1,4 +1,5 @@
 using Api;
+using Api.Extensions;
 using Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    // "I also like to live dangerously" - Austin Powers
+    await app.Services.EnsureDatabaseUpdated();
+}
 
 app.UseMiddleware<UnhandledExceptionMiddleware>();
 
@@ -25,5 +31,4 @@ app.UseMiddleware<BasicAuthenticationHandler>();
 
 app.UseApplicationEndpoints();
 
-// using (var scope = app.Services.CreateScope()) { await FunAndGames.TestStreamPrompt(scope, "Hello, i enjoy having fun!"); }
 app.Run();

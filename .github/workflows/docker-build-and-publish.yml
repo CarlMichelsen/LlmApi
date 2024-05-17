@@ -1,0 +1,37 @@
+name: Build And Publish Workflow
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  docker-build-publish:
+    name: Build and publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Build container image
+        run: docker build -t ${{secrets.REGISTRY}}/${{secrets.IMAGE_NAME}}:latest .
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+            token: ${{secrets.DIGITALOCEAN_ACCESS_TOKEN}}
+
+      - name: Log in to DigitalOcean Docker Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Remove all old images
+        run: |
+          REPO_NAME="${{ secrets.IMAGE_NAME }}"; 
+          if doctl registry repository list | grep -q "$REPO_NAME"; then 
+            for tag in $(doctl registry repository list-tags "$REPO_NAME" | grep -o 'sha256:[a-zA-Z0-9]*' || echo ""); do 
+              [ -z "$tag" ] || doctl registry repository delete-manifest "$REPO_NAME" "$tag" --force; 
+            done; 
+          else 
+            echo "No repository named $REPO_NAME found."; 
+          fi
+      - name: Push image to DigitalOcean Docker Registry
+        run: docker push ${{secrets.REGISTRY}}/${{secrets.IMAGE_NAME}}:latest
