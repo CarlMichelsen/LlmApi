@@ -2,6 +2,22 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <PackageId>LargeLanguageModelClient</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Carl Lilholm Michelsen</Authors>
+    <Company>Hyggeboks</Company>
+    <Description>A package designed to communicate with the LlmApi.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <RepositoryUrl>https://github.com/CarlMichelsen/LlmApi</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>chat gpt gpt-3.5 gpt-4 gpt-4o anthropic openai claude3 sonnet opus haiku ai chatbot language-model large-language-model</PackageTags>
+    
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>

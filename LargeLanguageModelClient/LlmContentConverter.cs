@@ -1,9 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using LargeLanguageModelClient;
 using LargeLanguageModelClient.Dto.Prompt.Content;
 
-namespace Implementation.Json;
+namespace LargeLanguageModelClient;
 
 public class LlmContentConverter : JsonConverter<LlmContent>
 {

@@ -15,7 +15,7 @@ public class HttpPromptStreamService(
 
     public async Task StreamPrompt(LlmPromptDto llmPromptDto, CancellationToken cancellationToken)
     {
-        var context = httpContextAccessor.HttpContext;
+        var context = httpContextAccessor.HttpContext!;
         var promptStream = largeLanguageModelService.PromptStream(llmPromptDto, cancellationToken);
         await foreach (var item in this.ToStringStream(promptStream))
         {

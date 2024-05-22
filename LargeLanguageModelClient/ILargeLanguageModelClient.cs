@@ -1,11 +1,12 @@
 ﻿using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Response;
+using LargeLanguageModelClient.Dto.Response.Stream;
 
 namespace LargeLanguageModelClient;
 
 public interface ILargeLanguageModelClient
 {
-    Task<LlmResponse> Prompt(LlmPromptDto llmPromptDto);
+    Task<LlmResponse> Prompt(LlmPromptDto llmPromptDto, CancellationToken cancellationToken);
 
-    IAsyncEnumerable<object> PromptStream(LlmPromptDto llmPromptDto);
+    IAsyncEnumerable<LlmStreamEvent> PromptStream(LlmPromptDto llmPromptDto, CancellationToken cancellationToken);
 }
