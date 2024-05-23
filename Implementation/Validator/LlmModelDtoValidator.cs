@@ -1,6 +1,6 @@
-﻿using Domain.Dto.Llm;
-using Domain.Entity;
+﻿using Domain.Entity;
 using FluentValidation;
+using LargeLanguageModelClient.Dto.Model;
 
 namespace Implementation.Validator;
 

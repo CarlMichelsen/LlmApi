@@ -1,4 +1,4 @@
-﻿namespace Domain;
+﻿namespace LargeLanguageModelClient.Dto.Model;
 
 public record LlmPriceDto(
     Guid Id,

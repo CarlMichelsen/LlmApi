@@ -1,5 +1,5 @@
 ﻿using Domain.Dto;
-using Domain.Dto.Llm;
+using LargeLanguageModelClient.Dto.Model;
 
 namespace Interface.Handler;
 

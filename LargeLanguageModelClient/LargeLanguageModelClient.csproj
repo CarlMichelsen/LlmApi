@@ -3,17 +3,18 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <PackageId>LargeLanguageModelClient</PackageId>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>Carl Lilholm Michelsen</Authors>
     <Company>Hyggeboks</Company>
     <Description>A package designed to communicate with the LlmApi.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <RepositoryUrl>https://github.com/CarlMichelsen/LlmApi</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>chat gpt gpt-3.5 gpt-4 gpt-4o anthropic openai claude3 sonnet opus haiku ai chatbot language-model large-language-model</PackageTags>
     
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added model fetching.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -25,6 +26,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
 </Project>
