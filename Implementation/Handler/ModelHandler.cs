@@ -1,8 +1,8 @@
 ﻿using Domain.Dto;
-using Domain.Dto.Llm;
 using Domain.Exception;
 using Interface.Handler;
 using Interface.Service;
+using LargeLanguageModelClient.Dto.Model;
 
 namespace Implementation.Handler;
 

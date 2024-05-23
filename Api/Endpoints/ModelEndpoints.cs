@@ -1,6 +1,6 @@
 ﻿using Api.Attributes;
-using Domain.Dto.Llm;
 using Interface.Handler;
+using LargeLanguageModelClient.Dto.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Endpoints;
@@ -13,6 +13,8 @@ public static class ModelEndpoints
 
     private static readonly BasicAuthAttribute AdminAuthAttribute = new BasicAuthAttribute(true);
 
+    private static readonly BasicAuthAttribute UserAuthAttribute = new BasicAuthAttribute(false);
+
     public static RouteGroupBuilder RegisterModelEndpoints(this RouteGroupBuilder group)
     {
         var modelGroup = group
@@ -21,16 +23,19 @@ public static class ModelEndpoints
         modelGroup
             .MapGet("/all", (IModelHandler modelHandler) => modelHandler.GetAllModels())
             .WithTags(ModelTag)
+            .WithMetadata(UserAuthAttribute)
             .WithName("GetAllModels");
         
         modelGroup
             .MapGet("/provider/{provider}", ([FromRoute] string provider, IModelHandler modelHandler) => modelHandler.GetModelsByProvider(provider))
             .WithTags(ModelTag)
+            .WithMetadata(UserAuthAttribute)
             .WithName("GetProviderModels");
         
         modelGroup
             .MapGet("/{id}", ([FromRoute] Guid id, IModelHandler modelHandler) => modelHandler.GetModel(id))
             .WithTags(ModelTag)
+            .WithMetadata(UserAuthAttribute)
             .WithName("GetModel");
         
         modelGroup

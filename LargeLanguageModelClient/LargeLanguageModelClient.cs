@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using LargeLanguageModelClient.Dto.Model;
 using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Response;
 using LargeLanguageModelClient.Dto.Response.Stream;
@@ -25,6 +26,23 @@ internal class LargeLanguageModelClient(
             new LlmContentConverter(),
         },
     };
+
+    public async Task<List<LlmModelDto>> GetAllModels()
+    {
+        var res = await httpClient.GetAsync("api/v1/model/all");
+        res.EnsureSuccessStatusCode();
+
+        var list = await res.Content.ReadFromJsonAsync<List<LlmModelDto>>();
+        return list ?? [];
+    }
+
+    public async Task<LlmModelDto?> GetModel(Guid modelId)
+    {
+        var res = await httpClient.GetAsync($"api/v1/model/{modelId}");
+        res.EnsureSuccessStatusCode();
+
+        return await res.Content.ReadFromJsonAsync<LlmModelDto>();
+    }
 
     public async Task<LlmResponse> Prompt(LlmPromptDto llmPromptDto, CancellationToken cancellationToken)
     {

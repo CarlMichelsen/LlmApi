@@ -1,4 +1,4 @@
-﻿namespace Domain.Dto.Llm;
+﻿namespace LargeLanguageModelClient.Dto.Model;
 
 public record LlmModelDto(
     Guid Id,

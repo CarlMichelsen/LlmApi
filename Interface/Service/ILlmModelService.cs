@@ -1,5 +1,5 @@
 ﻿using Domain.Abstraction;
-using Domain.Dto.Llm;
+using LargeLanguageModelClient.Dto.Model;
 
 namespace Interface.Service;
 

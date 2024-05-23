@@ -1,8 +1,7 @@
-﻿using Domain;
-using Domain.Dto.Llm;
-using Domain.Entity;
+﻿using Domain.Entity;
 using Domain.Entity.Id;
 using Domain.Exception;
+using LargeLanguageModelClient.Dto.Model;
 
 namespace Implementation.Map;
 

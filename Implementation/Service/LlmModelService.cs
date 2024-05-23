@@ -1,12 +1,11 @@
 ﻿using Domain.Abstraction;
-using Domain.Dto.Llm;
 using Domain.Entity;
-using Domain.Entity.Id;
 using Domain.Exception;
 using Implementation.Map;
 using Implementation.Validator;
 using Interface.Repository;
 using Interface.Service;
+using LargeLanguageModelClient.Dto.Model;
 
 namespace Implementation.Service;
 
