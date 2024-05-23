@@ -8,6 +8,7 @@
     <Company>Hyggeboks</Company>
     <Description>A package designed to communicate with the LlmApi.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <RepositoryUrl>https://github.com/CarlMichelsen/LlmApi</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
