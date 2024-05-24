@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using LargeLanguageModelClient.Dto;
 using LargeLanguageModelClient.Dto.Model;
 using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Response;
@@ -27,34 +28,29 @@ internal class LargeLanguageModelClient(
         },
     };
 
-    public async Task<List<LlmModelDto>> GetAllModels()
+    public async Task<ServiceResponse<List<LlmModelDto>>> GetAllModels()
     {
         var res = await httpClient.GetAsync("api/v1/model/all");
         res.EnsureSuccessStatusCode();
 
-        var list = await res.Content.ReadFromJsonAsync<List<LlmModelDto>>();
-        return list ?? [];
+        var response = await res.Content.ReadFromJsonAsync<ServiceResponse<List<LlmModelDto>>>();
+        return response ?? new ServiceResponse<List<LlmModelDto>>("No response");
     }
 
-    public async Task<LlmModelDto?> GetModel(Guid modelId)
+    public async Task<ServiceResponse<LlmModelDto>> GetModel(Guid modelId)
     {
         var res = await httpClient.GetAsync($"api/v1/model/{modelId}");
         res.EnsureSuccessStatusCode();
 
-        return await res.Content.ReadFromJsonAsync<LlmModelDto>();
+        var response = await res.Content.ReadFromJsonAsync<ServiceResponse<LlmModelDto>>();
+        return response ?? new ServiceResponse<LlmModelDto>("No response");
     }
 
-    public async Task<LlmResponse> Prompt(LlmPromptDto llmPromptDto, CancellationToken cancellationToken)
+    public async Task<ServiceResponse<LlmResponse>> Prompt(LlmPromptDto llmPromptDto, CancellationToken cancellationToken)
     {
         var res = await this.Request(llmPromptDto, cancellationToken, false);
-        var serviceResponse = await res.Content.ReadFromJsonAsync<LlmServiceResponse>(this.options)
-            ?? throw new LargeLanguageModelClientException("Prompt request unserializable");
-        if (!serviceResponse.Ok)
-        {
-            throw new LargeLanguageModelClientException(string.Join(',', serviceResponse.Errors));
-        }
-
-        return serviceResponse.Data!;
+        var serviceResponse = await res.Content.ReadFromJsonAsync<ServiceResponse<LlmResponse>>(this.options);
+        return serviceResponse ?? new ServiceResponse<LlmResponse>("No response");
     }
 
     public async IAsyncEnumerable<LlmStreamEvent> PromptStream(LlmPromptDto llmPromptDto, [EnumeratorCancellation] CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-﻿using Domain.Dto;
+﻿using LargeLanguageModelClient.Dto;
 using LargeLanguageModelClient.Dto.Model;
 
 namespace Interface.Handler;

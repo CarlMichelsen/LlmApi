@@ -1,4 +1,4 @@
-﻿using Domain.Dto;
+﻿using LargeLanguageModelClient.Dto;
 
 namespace UnitTest.Dto;
 

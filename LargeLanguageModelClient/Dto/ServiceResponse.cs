@@ -1,4 +1,4 @@
-﻿namespace Domain.Dto;
+﻿namespace LargeLanguageModelClient.Dto;
 
 public class ServiceResponse<T>
 {
