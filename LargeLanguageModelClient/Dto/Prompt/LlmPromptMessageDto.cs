@@ -1,7 +1,8 @@
-﻿using LargeLanguageModelClient.Dto.Prompt.Content;
+﻿using System.Text.Json.Serialization;
+using LargeLanguageModelClient.Dto.Prompt.Content;
 
 namespace LargeLanguageModelClient.Dto.Prompt;
 
 public record LlmPromptMessageDto(
-    bool IsUserMessage,
-    List<LlmContent> Content);
+    [property: JsonPropertyName("isUserMessage")] bool IsUserMessage,
+    [property: JsonPropertyName("content")] List<LlmContent> Content);
