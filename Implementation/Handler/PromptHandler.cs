@@ -1,7 +1,7 @@
-﻿using Domain.Dto;
-using Domain.Exception;
+﻿using Domain.Exception;
 using Interface.Handler;
 using Interface.Service;
+using LargeLanguageModelClient.Dto;
 using LargeLanguageModelClient.Dto.Prompt;
 using LargeLanguageModelClient.Dto.Response;
 
