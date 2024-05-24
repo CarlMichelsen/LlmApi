@@ -1,4 +1,6 @@
-﻿namespace LargeLanguageModelClient.Dto.Response.Stream.Event;
+﻿using System.Text.Json.Serialization;
+
+namespace LargeLanguageModelClient.Dto.Response.Stream.Event;
 
 public class LlmStreamError : LlmStreamEvent
 {
@@ -7,7 +9,9 @@ public class LlmStreamError : LlmStreamEvent
         this.Message = message;
     }
 
+    [JsonPropertyName("type")]
     public override LlmStreamEventType Type => LlmStreamEventType.Error;
 
+    [JsonPropertyName("message")]
     public string Message { get; init; }
 }

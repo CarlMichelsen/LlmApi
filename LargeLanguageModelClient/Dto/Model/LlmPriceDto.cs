@@ -1,6 +1,8 @@
-﻿namespace LargeLanguageModelClient.Dto.Model;
+﻿using System.Text.Json.Serialization;
+
+namespace LargeLanguageModelClient.Dto.Model;
 
 public record LlmPriceDto(
-    Guid Id,
-    int MillionInputTokenPrice,
-    int MillionOutputTokenPrice);
+    [property: JsonPropertyName("id")] Guid Id,
+    [property: JsonPropertyName("millionInputTokenPrice")] int MillionInputTokenPrice,
+    [property: JsonPropertyName("millionOutputTokenPrice")] int MillionOutputTokenPrice);

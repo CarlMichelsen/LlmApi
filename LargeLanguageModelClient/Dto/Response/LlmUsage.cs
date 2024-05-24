@@ -1,5 +1,7 @@
-﻿namespace LargeLanguageModelClient.Dto.Response;
+﻿using System.Text.Json.Serialization;
+
+namespace LargeLanguageModelClient.Dto.Response;
 
 public record LlmUsage(
-    long InputTokens,
-    long OutputTokens);
+    [property: JsonPropertyName("inputTokens")] long InputTokens,
+    [property: JsonPropertyName("outputTokens")] long OutputTokens);

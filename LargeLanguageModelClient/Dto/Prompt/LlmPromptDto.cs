@@ -1,6 +1,8 @@
-﻿namespace LargeLanguageModelClient.Dto.Prompt;
+﻿using System.Text.Json.Serialization;
+
+namespace LargeLanguageModelClient.Dto.Prompt;
 
 public record LlmPromptDto(
-    Guid ModelIdentifier,
-    string? SystemMessage,
-    List<LlmPromptMessageDto> Messages);
+    [property: JsonPropertyName("modelIdentifier")] Guid ModelIdentifier,
+    [property: JsonPropertyName("systemMessage")] string? SystemMessage,
+    [property: JsonPropertyName("messages")] List<LlmPromptMessageDto> Messages);
