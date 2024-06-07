@@ -22,9 +22,7 @@ public class OpenAiStreamReader(
         Stream stream,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var lineReader = streamLineReader.ReadLine(stream, cancellationToken);
-
-        await foreach (var line in lineReader)
+        await foreach (var line in streamLineReader.ReadLine(stream, cancellationToken))
         {
             if (string.IsNullOrWhiteSpace(line))
             {
@@ -39,7 +37,6 @@ public class OpenAiStreamReader(
             }
 
             var data = split.Last();
-
             if (data == DoneString)
             {
                 yield break;

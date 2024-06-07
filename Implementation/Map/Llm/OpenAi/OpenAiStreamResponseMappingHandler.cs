@@ -56,7 +56,7 @@ public class OpenAiStreamResponseMappingHandler(
     public LlmStreamContentDelta? MapContentDelta(OpenAiStreamEvent streamEvent)
     {
         var choice = streamEvent.Choices.FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(choice?.Delta.Content))
+        if (string.IsNullOrEmpty(choice?.Delta.Content))
         {
             return default;
         }

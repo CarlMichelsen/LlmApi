@@ -102,7 +102,7 @@ internal class LargeLanguageModelClient(
     private async Task<HttpResponseMessage> Request(
         LlmPromptDto prompt,
         CancellationToken cancellationToken,
-        bool stream = false)
+        bool stream)
     {
         var json = JsonSerializer.Serialize(prompt, this.options);
         var payload = new StringContent(json, Encoding.UTF8, "application/json");

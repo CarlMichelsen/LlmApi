@@ -83,7 +83,7 @@ public class OpenAiClient(
             openAiPrompt = openAiPrompt with { Stream = true, StreamOptions = new OpenAiStreamOptions(IncludeUsage: true) };
         }
         
-        var openAiStreamHandler = new OpenAiStreamReader(streamLineReader);
+        var openAiStreamReader = new OpenAiStreamReader(streamLineReader);
         await using (var apiKey = apiKeyResult.Unwrap())
         {
             var responseResult = await this.Request(openAiPrompt, apiKey!, cancellationToken, true);
@@ -97,7 +97,7 @@ public class OpenAiClient(
                 .Unwrap().Content
                 .ReadAsStream(cancellationToken);
             
-            await foreach (var openAiEventResult in openAiStreamHandler.Read(httpResponseStream, cancellationToken))
+            await foreach (var openAiEventResult in openAiStreamReader.Read(httpResponseStream, cancellationToken))
             {
                 if (openAiEventResult.IsError)
                 {
