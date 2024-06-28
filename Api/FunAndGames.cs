@@ -35,7 +35,9 @@ public static class FunAndGames
                             Text = customPrompt ?? Story,
                         },
                     }),
-            });
+            },
+            Origin: "fun-and-games",
+            Metadata: "nofin");
         
         var sb = new StringBuilder();
         Console.Clear();
@@ -75,7 +77,9 @@ public static class FunAndGames
                             Text = customPrompt ?? Story,
                         },
                     }),
-            });
+            },
+            Origin: "fun-and-games",
+            Metadata: "nofin");
         
         var result = await largeLanguageModelService.Prompt(prompt, CancellationToken.None);
         if (result.IsError)

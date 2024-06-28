@@ -120,7 +120,9 @@ public class GenericLargeLanguageModelClientTests
                             Text = "Hello, World!",
                         },
                     }),
-            });
+            },
+            Origin: "test-user",
+            Metadata: "yeehaw");
 
     private ModelEntity MockModel(Guid identifier, LlmProvider provider)
     {
