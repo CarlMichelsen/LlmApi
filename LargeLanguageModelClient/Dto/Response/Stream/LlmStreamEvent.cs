@@ -3,7 +3,7 @@ using LargeLanguageModelClient.Dto.Response.Stream.Event;
 
 namespace LargeLanguageModelClient.Dto.Response.Stream;
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Type))]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(LlmStreamContentDelta), (int)LlmStreamEventType.ContentDelta)]
 [JsonDerivedType(typeof(LlmStreamContentStart), (int)LlmStreamEventType.ContentStart)]
 [JsonDerivedType(typeof(LlmStreamContentStop), (int)LlmStreamEventType.ContentStop)]

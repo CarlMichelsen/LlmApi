@@ -2,7 +2,7 @@
 
 namespace LargeLanguageModelClient.Dto.Prompt.Content;
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Type))]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(LlmImageContent), (int)LlmContentType.Image)]
 [JsonDerivedType(typeof(LlmTextContent), (int)LlmContentType.Text)]
 public abstract class LlmContent
