@@ -21,7 +21,7 @@ public class OpenAiContentConverter : JsonConverter<OpenAiContent>
             {
                 "text" => typeof(OpenAiTextContent),
                 "image_url" => typeof(OpenAiImageContent),
-                _ => throw new JsonException($"Unknown AnthropicContent type \"{typeDiscriminator}\"."),
+                _ => throw new JsonException($"Unknown OpenAi type \"{typeDiscriminator}\"."),
             };
 
             var rawJson = root.GetRawText();

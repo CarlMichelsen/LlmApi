@@ -22,10 +22,6 @@ internal class LargeLanguageModelClient(
     private readonly JsonSerializerOptions options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Converters =
-        {
-            new LlmContentConverter(),
-        },
     };
 
     public async Task<ServiceResponse<List<LlmModelDto>>> GetAllModels()

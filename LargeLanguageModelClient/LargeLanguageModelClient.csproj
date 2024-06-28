@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <PackageId>LargeLanguageModelClient</PackageId>
-    <Version>0.0.5</Version>
+    <Version>0.0.6</Version>
     <Authors>Carl Lilholm Michelsen</Authors>
     <Company>Hyggeboks</Company>
     <Description>A package designed to communicate with the LlmApi.</Description>
@@ -14,7 +14,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>chat gpt gpt-3.5 gpt-4 gpt-4o anthropic openai claude3 sonnet opus haiku ai chatbot language-model large-language-model</PackageTags>
     
-    <PackageReleaseNotes>Service response model can now be deserialized properly.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added extra fields in prompt called Origin and Metadata for later use.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>

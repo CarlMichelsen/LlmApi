@@ -22,7 +22,7 @@ public static class FunAndGames
         var largeLanguageModelService = scope.ServiceProvider.GetRequiredService<ILargeLanguageModelService>();
 
         var prompt = new LlmPromptDto(
-            ModelIdentifier: Guid.Parse("d9393a63-dbdc-4658-9014-ee47726d4afc"),
+            ModelIdentifier: Guid.Parse("d94cb402-f6f6-4144-9e1e-d9476d487c94"),
             SystemMessage: "Only respond with accurate german translations of what has been said",
             Messages: new List<LlmPromptMessageDto>
             {
@@ -35,7 +35,9 @@ public static class FunAndGames
                             Text = customPrompt ?? Story,
                         },
                     }),
-            });
+            },
+            Origin: "fun-and-games",
+            Metadata: "nofin");
         
         var sb = new StringBuilder();
         Console.Clear();
@@ -75,7 +77,9 @@ public static class FunAndGames
                             Text = customPrompt ?? Story,
                         },
                     }),
-            });
+            },
+            Origin: "fun-and-games",
+            Metadata: "nofin");
         
         var result = await largeLanguageModelService.Prompt(prompt, CancellationToken.None);
         if (result.IsError)
