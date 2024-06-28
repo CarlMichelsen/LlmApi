@@ -12,7 +12,6 @@ using Interface.Handler;
 using Interface.Json;
 using Interface.Repository;
 using Interface.Service;
-using LargeLanguageModelClient;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -49,7 +48,6 @@ public static class Dependencies
             .Configure<AnthropicOptions>(builder.Configuration.GetSection(AnthropicOptions.SectionName))
             .Configure<JsonOptions>(options =>
             {
-                options.SerializerOptions.Converters.Add(new LlmContentConverter());
                 options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.SerializerOptions.MaxDepth = 30;
             });

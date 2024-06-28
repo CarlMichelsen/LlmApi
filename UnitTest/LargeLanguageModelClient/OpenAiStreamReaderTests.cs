@@ -9,8 +9,8 @@ public class OpenAiStreamReaderTests
 {
     private OpenAiPrompt PlaceholderPrompt => new OpenAiPrompt(
             Model: "gpt-4o",
-            Messages: new List<OpenAiMessage>
-            {
+            Messages:
+            [
                 new OpenAiMessage(
                     "user",
                     new List<OpenAiContent>
@@ -20,7 +20,7 @@ public class OpenAiStreamReaderTests
                             Text = "I'm a placeholder prompt, i don't actually do anything",
                         },
                     }),
-            },
+            ],
             4000);
     
     [Theory]
