@@ -31,6 +31,7 @@ public class AnthropicStreamMapper(ILogger logger, ModelEntity model)
             var antropicEventType = anthropicStreamEvent.Type;
             LlmStreamEvent? llmStreamEvent = antropicEventType switch
             {
+                "error" => handler.AnthropicStreamError((AnthropicStreamError)anthropicStreamEvent),
                 "message_start" => handler.AnthropicStreamMessageStart((AnthropicStreamMessageStart)anthropicStreamEvent),
                 "content_block_start" => handler.AnthropicStreamContentBlockStart((AnthropicStreamContentBlockStart)anthropicStreamEvent),
                 "content_block_delta" => handler.AnthropicStreamContentBlockDelta((AnthropicStreamContentBlockDelta)anthropicStreamEvent),
