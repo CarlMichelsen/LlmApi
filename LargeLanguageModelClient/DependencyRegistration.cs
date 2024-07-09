@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace LargeLanguageModelClient;
 
@@ -12,11 +11,11 @@ public static class DependencyRegistration
     {
         services.AddHttpClient<ILargeLanguageModelClient, LargeLanguageModelClient>(client =>
         {
-            client.BaseAddress = baseAddress;
-            var userPassBytes = System.Text.Encoding.UTF8.GetBytes($"{userPass.Username}:{userPass.Password}");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Basic",
-                Convert.ToBase64String(userPassBytes));
+            LargeLanguageModelClientFactory.ModifyHttpClient(
+                client,
+                baseAddress,
+                userPass.Username,
+                userPass.Password);
         });
 
         return services;

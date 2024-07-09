@@ -20,6 +20,11 @@ public class AnthropicStreamResponseMappingHandler(
     private long? outputTokens;
     private double outputTokensEstimate = 0;
 
+    public LlmStreamEvent AnthropicStreamError(AnthropicStreamError streamEvent)
+    {
+        return new LlmStreamError(streamEvent.Error.Message);
+    }
+
     public LlmStreamEvent? AnthropicStreamMessageStart(AnthropicStreamMessageStart streamEvent)
     {
         var res = this.mapper.Map(streamEvent.Message).Unwrap();
