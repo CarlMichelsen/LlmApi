@@ -4,7 +4,8 @@ namespace LargeLanguageModelClient.Dto.Prompt.Content;
 
 public class LlmTextContent : LlmContent
 {
-    public override LlmContentType Type { get => LlmContentType.Text; }
+    [JsonIgnore]
+    public override LlmContentType Type => LlmContentType.Text;
 
     [JsonPropertyName("text")]
     public required string Text { get; init; }

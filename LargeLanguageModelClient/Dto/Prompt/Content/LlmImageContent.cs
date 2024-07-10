@@ -4,6 +4,7 @@ namespace LargeLanguageModelClient.Dto.Prompt.Content;
 
 public class LlmImageContent : LlmContent
 {
+    [JsonIgnore]
     public override LlmContentType Type => LlmContentType.Image;
 
     public string Format => "base64";
