@@ -3,6 +3,7 @@ using Domain.Abstraction;
 using Domain.Dto.Anthropic.Response.Stream;
 using Domain.Entity;
 using LargeLanguageModelClient.Dto.Response.Stream;
+using LargeLanguageModelClient.Dto.Response.Stream.Event;
 using Microsoft.Extensions.Logging;
 
 namespace Implementation.Map.Llm.Anthropic;
@@ -44,6 +45,11 @@ public class AnthropicStreamMapper(ILogger logger, ModelEntity model)
             if (llmStreamEvent is not null)
             {
                 yield return llmStreamEvent;
+
+                if (llmStreamEvent is LlmStreamError)
+                {
+                    break;
+                }
             }
         }
 

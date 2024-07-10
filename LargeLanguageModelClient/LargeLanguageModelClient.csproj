@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <PackageId>LargeLanguageModelClient</PackageId>
-    <Version>0.0.8</Version>
+    <Version>0.0.10</Version>
     <Authors>Carl Lilholm Michelsen</Authors>
     <Company>Hyggeboks</Company>
     <Description>A package designed to communicate with the LlmApi.</Description>
@@ -14,7 +14,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>chat gpt gpt-3.5 gpt-4 gpt-4o anthropic openai claude3 sonnet opus haiku ai chatbot language-model large-language-model</PackageTags>
     
-    <PackageReleaseNotes>An ILargeLanguageModelClient can now be created with a factory outside DI. Anthropic model stream response will now handle antropic stream errors properly.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed field duplication in json serialization, really.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
