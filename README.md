@@ -6,7 +6,7 @@ It supports streaming responses back in real time and the prompts have an identi
 ## Publish consumer nuget package
 dotnet pack -c Release --verbosity detailed ./LargeLanguageModelClient
 
-dotnet nuget push path/to/LargeLanguageModelClient.0.0.2.nupkg -k API-KEY-HERE -s https://api.nuget.org/v3/index.json
+dotnet nuget push ./LargeLanguageModelClient/bin/Release/LargeLanguageModelClient.0.0.10.nupkg -k API-KEY-HERE -s https://api.nuget.org/v3/index.json
 
 # Build docker image
 ```bash
